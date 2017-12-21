@@ -13,7 +13,7 @@ use backend\models\ArticleCategory;
 use yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\Request;
-use yii\web\UploadedFile;
+
 
 class ArticleCategoryController extends Controller
 {
@@ -25,7 +25,7 @@ class ArticleCategoryController extends Controller
         ]);
 
         $articleCategory = $query->limit($pager->limit)->offset($pager->offset)->orderBy('id desc')->all();
-        return $this->render('index',['articleCategory'=>$articleCategory,'pager'=>$pager]);
+        return $this->render('index',['categories'=>$articleCategory,'pager'=>$pager]);
     }
 
     public function actionAdd(){
@@ -34,8 +34,7 @@ class ArticleCategoryController extends Controller
         if($request->isPost){
             $model->load($request->post());
             if($model->validate()){
-
-                $model->save(false);
+                $model->save();
                 return $this->redirect(['index']);
             }
         }
@@ -48,14 +47,19 @@ class ArticleCategoryController extends Controller
         if($request->isPost){
             $model->load($request->post());
             if($model->validate()){
-                $model->save(false);
+                $model->save();
                 return $this->redirect(['index']);
             }
         }
         return $this->render('add',['model'=>$model]);
     }
 
-    public function del(){
-
+    public function actionDel(){
+        $request = new Request();
+        if($request->isPost){
+            $id = $request->post('id');
+            $model = ArticleCategory::findOne(['id'=>$id]);
+            $model->delete();
+        }
     }
 }

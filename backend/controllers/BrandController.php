@@ -86,10 +86,10 @@ class BrandController extends Controller
             /*return Json::encode(['url'=>$fileName]);*/
 
             //==========上传图片到cdn 七牛云=======
-            $accessKey ="your accessKey";
-            $secretKey = "your secretKey"
-            $bucket = "your bucket name";
-
+            $accessKey ="4GOcBDckIZEOOm4tqPjksmiF4Pm1ejUuTCe8pDCF";
+            $secretKey = "jueQQESG8sjqggMI3iohYq3XA3HSgovZYiZEsf3s";
+            $bucket = "yiishop";
+            $domian = 'p1aylb874.bkt.clouddn.com';
             // 构建鉴权对象
             $auth = new Auth($accessKey, $secretKey);
 
@@ -97,10 +97,10 @@ class BrandController extends Controller
             $token = $auth->uploadToken($bucket);
 
             // 要上传文件的本地路径
-            $filePath = './php-logo.png';
+            $filePath = \Yii::getAlias('@webroot').$fileName;
 
             // 上传到七牛后保存的文件名
-            $key = 'my-php-logo.png';
+            $key = $fileName;
 
             // 初始化 UploadManager 对象并进行文件的上传。
             $uploadMgr = new UploadManager();
@@ -109,9 +109,10 @@ class BrandController extends Controller
             list($ret, $err) = $uploadMgr->putFile($token, $key, $filePath);
             echo "\n====> putFile result: \n";
             if ($err !== null) {
-                var_dump($err);
+                return Json::encode(['error'=>1]);
             } else {
-                var_dump($ret);
+                $url = "http://{$domian}/{$key}";
+                return Json::encode(['url'=>$url]);
             }
 
             //==========上传图片到cdn 七牛云=======

@@ -18,14 +18,6 @@ class ArticleCategory extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
-        return 'article_category';
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [

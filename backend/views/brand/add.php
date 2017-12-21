@@ -17,11 +17,11 @@ echo <<<HTML
     <!--用来存放item-->
     <div id="fileList" class="uploader-list"></div>
     <div id="filePicker">选择图片</div>
-    
 </div>
 HTML;
 $upload_url = \yii\helpers\Url::to(['brand/upload']);
-$js = <<<JS
+$js =
+    <<<JS
     var uploader = WebUploader.create({
 
     // 选完文件后，是否自动上传。
