@@ -28,14 +28,49 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => 'Yiishop',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
+    $menuItems=[
+        [
+            'label'=>'品牌管理',
+            'items'=>[
+                ['label' => '品牌列表', 'url' =>['/brand/index']],
+
+                ['label' => '添加品牌', 'url' => ['/brand/add']],
+            ]
+        ],
+        [
+            'label'=>'文章管理',
+            'items'=>[
+                ['label' => '文章列表', 'url' => ['/article/index']],
+                ['label' => '文章分类', 'url' => ['/article-category/index']],
+            ],
+        ],
+        [
+            'label'=>'商品管理',
+            'items'=>[
+                ['label' => '商品列表', 'url' =>['/goods/index']],
+                ['label' => '商品分类', 'url' => ['/goods-category/index']],
+            ]
+        ],
+        [
+            'label'=>'管理员',
+            'items'=>[
+                ['label' => '管理员列表', 'url' => ['/user/index']],
+                ['label' => '权限管理', 'url' => ['/brand/add']],
+            ]
+        ],
+        [
+            'label'=>'回收站',
+            'items'=>[
+                ['label' => '文章回收站', 'url' => ['/trash/index']],
+                ['label' => '品牌回收站', 'url' => ['/trash/index']],
+            ]
+        ],
     ];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];

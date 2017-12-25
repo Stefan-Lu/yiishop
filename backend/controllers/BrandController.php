@@ -107,11 +107,12 @@ class BrandController extends Controller
 
             // 调用 UploadManager 的 putFile 方法进行文件的上传。
             list($ret, $err) = $uploadMgr->putFile($token, $key, $filePath);
-            echo "\n====> putFile result: \n";
+            //echo "\n====> putFile result: \n";
             if ($err !== null) {
                 return Json::encode(['error'=>1]);
             } else {
                 $url = "http://{$domian}/{$key}";
+                //var_dump(Json::encode(['url'=>$url]));die;
                 return Json::encode(['url'=>$url]);
             }
 

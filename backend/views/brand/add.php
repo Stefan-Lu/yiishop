@@ -17,8 +17,11 @@ echo <<<HTML
     <!--用来存放item-->
     <div id="fileList" class="uploader-list"></div>
     <div id="filePicker">选择图片</div>
-</div>
 HTML;
+echo $model->logo?" <img class='img-thumbnail' id='img' width='100' height='100' src='$model->logo'>":'';
+echo '</div>';
+
+
 $upload_url = \yii\helpers\Url::to(['brand/upload']);
 $js =
     <<<JS
@@ -46,7 +49,8 @@ $js =
 });
 
   uploader.on( 'uploadSuccess', function( file , response) {
-        console.log(response);
+        console.log(response.url);
+        $('#img').remove();
         $("<img class='img-thumbnail' id='img' width='100' height='100' src='"+response.url+"'>").appendTo('#uploader-demo');
       /*  $("#img").attr('src',response.url);*/
         $("#brand-logo").val(response.url);
