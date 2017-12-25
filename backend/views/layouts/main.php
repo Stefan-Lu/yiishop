@@ -61,24 +61,19 @@ AppAsset::register($this);
             'label'=>'管理员',
             'items'=>[
                 ['label' => '管理员列表', 'url' => ['/user/index']],
-                ['label' => '权限管理', 'url' => ['/brand/add']],
+                ['label' => '添加管理员', 'url' => ['/user/add']],
+
             ]
         ],
-        [
-            'label'=>'回收站',
-            'items'=>[
-                ['label' => '文章回收站', 'url' => ['/trash/index']],
-                ['label' => '品牌回收站', 'url' => ['/trash/index']],
-            ]
-        ],
+
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => '登录', 'url' => ['/user/login']];
     } else {
         $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
+            . Html::beginForm(['/user/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                '注销 (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()
