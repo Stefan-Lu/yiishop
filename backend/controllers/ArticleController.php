@@ -13,6 +13,18 @@ use yii\web\Request;
 
 class ArticleController extends Controller
 {
+    public function actions()
+    {
+        return [
+            'ueditor'=>[
+                'class' => 'kucha\ueditor\UEditorAction',
+                'config'=>[
+                    'imageUrlPrefix' => "", /* 图片访问路径前缀 */
+                    'imagePathFormat' => "/image/{yyyy}{mm}{dd}/{time}{rand:6}", /* 上传保存路径,可以自定义保存路径和文件名格式 */
+                ]
+            ]
+        ];
+    }
     public function actionIndex(){
         $query = Article::find();
         $pager = new Pagination([
