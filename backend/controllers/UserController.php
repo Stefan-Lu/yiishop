@@ -38,6 +38,7 @@ class UserController extends Controller
                 //将传过来的密码进行加密
                 $user->password_hash = \Yii::$app->security->generatePasswordHash($user->password_hash);//进行加密
                 $user->created_at = time();
+                $user->auth_key = uniqid();
                 $user->status = 1;
                 $user->save();
                 \Yii::$app->session->setFlash("success","创建成功");
@@ -57,6 +58,7 @@ class UserController extends Controller
             $user->load($request->post());
             if($user->validate()){
                 //将传过来的密码进行加密
+                $user->auth_key = uniqid();
                 $user->password_hash = \Yii::$app->security->generatePasswordHash($user->password_hash);//进行加密
                 $user->save();
                 \Yii::$app->session->setFlash("success",'修改成功');

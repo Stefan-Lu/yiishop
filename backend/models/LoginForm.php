@@ -9,18 +9,22 @@ class LoginForm extends Model
 {
     public $username;
     public $password;
+    public  $rememberMe;
     public $code;//验证码
     public function attributeLabels()
     {
         return [
           'username'=>'用户名',
-            'password'=>'密码'
+            'password'=>'密码',
+            'rememberMe'=>'记住我',
+            'code'=>'验证码'
         ];
     }
     public function rules()
     {
        return [
          [['username','password'],'required'],//不能为空
+           [['rememberMe'],'integer'],
            ['code','captcha','captchaAction'=>'user/captcha'],
        ];
     }
@@ -30,7 +34,11 @@ class LoginForm extends Model
         if($user){
             //用户信息存在
             if(\Yii::$app->security->validatePassword($this->password,$user->password_hash)){
-                \Yii::$app->user->login($user);//存入用户的信息
+                $auto_login_time = '';
+                if($this->rememberMe){
+                    $auto_login_time = 3600*24*7;
+                }
+                \Yii::$app->user->login($user,$auto_login_time);//存入用户的信息
                 return true;
             }
             else{
