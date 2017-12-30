@@ -42,6 +42,7 @@ class ArticleController extends Controller
         $detail = new ArticleDetail();
         $categorys = ArticleCategory::find()->all();
         $options = ArrayHelper::map($categorys,'id','name');
+       //var_dump($options);die;
         if($request->isPost){
             $article->load($request->post());
             $detail->load($request->post());
