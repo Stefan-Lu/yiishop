@@ -86,6 +86,7 @@ class GoodsCategory extends \yii\db\ActiveRecord
     public static function getNodes(){
         $rows=self::find()->select('*')->asArray()->all();
         $parents = ['id'=>0,'parent_id'=>0,'name'=>'顶级目录'];
+        
         $rows[] = $parents;
         return Json::encode($rows);
     }
