@@ -7,7 +7,8 @@ use Yii;
 /**
  * This is the model class for table "goods_day_count".
  *
- * @property string $day
+ * @property integer $id
+ * @property integer $day
  * @property integer $count
  */
 class GoodsDayCount extends \yii\db\ActiveRecord
@@ -26,9 +27,7 @@ class GoodsDayCount extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['day', 'count'], 'required'],
-            [['day'], 'safe'],
-            [['count'], 'integer'],
+            [['day', 'count'], 'integer'],
         ];
     }
 
@@ -38,16 +37,9 @@ class GoodsDayCount extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'day' => '日期',
             'count' => '商品数',
         ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public static function primaryKey()
-    {
-        return ['day'];
     }
 }

@@ -26,7 +26,9 @@ class GoodsIntro extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['content'], 'string'],
+            [['goods_id'], 'integer'],
+            ['content','safe'],
+            [['content'], 'string', 'max' => 255],
         ];
     }
 
@@ -36,7 +38,7 @@ class GoodsIntro extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'goods_id' => 'Goods ID',
+            'goods_id' => '商品id',
             'content' => '商品描述',
         ];
     }

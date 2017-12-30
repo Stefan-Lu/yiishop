@@ -92,9 +92,10 @@ class ArticleController extends Controller
 
         }
     }
-    public function actionDetail($id){
-        $article = Article::findOne(['id'=>$id]);
-        $detail = ArticleDetail::findOne(['id'=>$id]);
-        return $this->render('detail',['article'=>$article,'detail'=>$detail]);
+    public function actionShow($id){
+        $model=Article::findOne($id);
+        $sonModel=ArticleDetail::findOne($id);
+        $category=ArticleCategory::find()->where(['status'=>[0,1]])->all();
+        return $this->render('detail',['model'=>$model,'sonModel'=>$sonModel,'category'=>$category]);
     }
 }

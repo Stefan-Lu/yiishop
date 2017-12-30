@@ -27,8 +27,8 @@ class GoodsGallery extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['goods_id'], 'required'],
-            [['goods_id'], 'integer'],
+            [['id', 'goods_id'], 'required'],
+            [['id', 'goods_id'], 'integer'],
             [['path'], 'string', 'max' => 255],
         ];
     }
@@ -40,8 +40,8 @@ class GoodsGallery extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'goods_id' => '商品id',
-            'path' => '图片地址',
+            'goods_id' => '',
+            'path' => '',
         ];
     }
 }

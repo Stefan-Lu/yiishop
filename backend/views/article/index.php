@@ -29,7 +29,9 @@
                 }
                 ?></td>
             <td><?=date('Y-m-d H:i:s',$article->create_time)?></td>
-            <td><?=\yii\bootstrap\Html::a('修改',['brand/edit','id'=>$article->id],['class'=>'btn btn-primary'])?>
+            <td>
+                <?=\yii\bootstrap\Html::a('预览',['article/show','id'=>$article->id],['class'=>'btn btn-info'])?>
+                <?=\yii\bootstrap\Html::a('修改',['article/edit','id'=>$article->id],['class'=>'btn btn-primary'])?>
                 <?=\yii\bootstrap\Html::a('删除',[''],['class'=>'btn btn-danger'])?>
             </td>
 
