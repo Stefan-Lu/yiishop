@@ -1,91 +1,80 @@
-<?php
-/**
- * @property integer $id
- * @property string $name
- * @property string $sn
- * @property string $logo
- * @property integer $goods_category_id
- * @property integer $brand_id
- * @property string $market_price
- * @property string $shop_price
- * @property integer $stock
- * @property integer $is_on_sale
- * @property integer $status
- * @property integer $sort
- * @property integer $create_time
- * @property integer $view_times
- */
-$form = \yii\bootstrap\ActiveForm::begin(['method'=>'get','action'=>'/goods/index']);
-echo $form->field($serch,'name')->textInput(['placeholder'=>'商品名','value'=>$serch->name]);
-echo $form->field($serch,'sn')->textInput(['placeholder'=>'货号','value'=>$serch->sn]);
-echo "<button type='submit'>搜索</button>";
-\yii\bootstrap\ActiveForm::end();
-$js = <<<JS
-        $('#result').on("click","tr td button",function() {
-//alert("点击");
-    var id = $(this).closest("tr").attr("id");//获取id
-    var result = confirm("确认要删除么");
-    if(result){ 
-        $.getJSON('/goods/delete',{"id":id});
-            $(this).closest("tr").fadeOut();
+<style>
+    tr td,th{
+        text-align: center;
     }
-})
-JS;
-$this->registerJs($js);
+    .btn-warning{
+        position: relative;
+        top: -6px;
+        left: 200px;
+    }
+</style>
+<h1>商品列表</h1>
+<?php
+$form=\yii\bootstrap\ActiveForm::begin(['method' => 'get','action' => \yii\helpers\Url::to(['goods/index']),'options' => ['class'=>'form-inline','role'=>'form'],]);
+    echo $form->field($goods,'name')->textInput(['placeholder'=>'商品名称',])->label('');
+    echo $form->field($goods,'sn')->textInput(['type'=>'tel','placeholder'=>'商品货号'])->label('');
+    echo $form->field($goods,'minPrice')->textInput(['type'=>'tel','placeholder'=>'最小价格'])->label('');
+    echo $form->field($goods,'maxPrice')->textInput(['type'=>'tel','placeholder'=>'最大价格'])->label('');
+    echo \yii\bootstrap\Html::submitButton('搜索<span class="glyphicon glyphicon-search"></span>',['class'=>'btn btn-warning']);
+\yii\bootstrap\ActiveForm::end();
 ?>
-<h2><a href="<?=\yii\helpers\Url::to(['goods/add'])?>">添加</a></h2>
-<table class="table table-bordered table-hover" style="text-align: center">
+
+<table class="table table-border">
     <tr>
-        <th>商品名</th>
-        <th>编号</th>
-        <th>logo</th>
-        <th>分类</th>
-        <th>品牌</th>
-        <th>市场售价</th>
+        <th>名称</th>
+        <th>货号</th>
+        <th>LOGO</th>
         <th>价格</th>
         <th>库存</th>
-        <th>是否上架</th>
-        <th>状态</th>
-        <th>排序</th>
-        <th>创建时间</th>
+        <th>是否在售</th>
         <th>浏览次数</th>
-        <th>预览</th>
-        <th>相册</th>
         <th>操作</th>
     </tr>
-    <tbody id="result">
-    <?php foreach ($goods as $good):?>
-        <tr id="<?=$good->id?>">
-            <td><?=$good->name?></td>
-            <td><?=$good->sn?></td>
-            <td><img src="<?=$good->logo?>" width="50px"></td>
-            <td><?=$arr[$good->goods_category_id]?></td>
-            <td><?=$good->brand->name?></td>
-            <td><?=$good->market_price?></td>
-            <td><?=$good->shop_price?></td>
-            <td><?=$good->stock?></td>
-            <td><?=$good->is_on_sale == 1 ?'上架':'下架'?></td>
+    <?php foreach ($rows as $row):?>
+        <tr id="goods<?php echo $row->id?>">
+            <td><?php echo $row->name?></td>
+            <td><?php echo $row->sn?></td>
+            <td><img src="<?php echo $row->logo?>" alt="" class="img-thumbnail" width="70px"></td>
+            <td><?php echo $row->shop_price?></td>
+            <td><?php echo $row->stock?></td>
+            <td><?php echo ($row->is_on_sale)?'上架':'下架'?></td>
+            <td><?php echo $row->view_times?>次</td>
             <td>
-                <?=$good->status == 1 ?'显示':''?>
-                <?=$good->status == 0 ?'隐藏':''?>
-            </td>
-            <td><?=$good->sort?></td>
-            <td><?=date("Y-m-d",$good->create_time)?></td>
-            <td><?=$good->view_times?></td>
-            <td>
-                <a class="btn btn-success" href="<?=\yii\helpers\Url::to(['goods/pre','id'=>$good->id])?>"><span class="glyphicon glyphicon-film"></span>预览</a>
-            </td>
-            <td>
-                <a class="btn btn-default" href="<?=\yii\helpers\Url::to(['goods/pic','id'=>$good->id])?>"><span class="glyphicon glyphicon-picture"></span>相册</a>
-            </td>
-            <td>
-                <a href="<?=\yii\helpers\Url::to(['goods/edit','id'=>$good->id])?>">修改</a>
-                <button class="btn" style="color: #2aabd2">删除</button>
+                <?php echo \yii\bootstrap\Html::a('相册',\yii\helpers\Url::to(['goods/gallery','id'=>$row->id]),['class'=>'btn btn-info btn-sm'])?>
+                <?php echo \yii\bootstrap\Html::a('预览',\yii\helpers\Url::to(['goods/show','id'=>$row->id]),['class'=>'btn btn-success btn-sm'])?>
+                <?php echo \yii\bootstrap\Html::a('修改',\yii\helpers\Url::to(['goods/update','id'=>$row->id]),['class'=>'btn btn-primary btn-sm'])?>
+                <?php echo \yii\bootstrap\Html::submitButton('删除',['class'=>'btn btn-danger btn-sm','id'=>$row->id])?>
             </td>
         </tr>
     <?php endforeach;?>
-    </tbody>
+    <tr>
+        <td colspan="9" style="text-align: left">
+            <?php echo \yii\bootstrap\Html::a('新增',\yii\helpers\Url::to(['goods/add']),['class'=>'btn btn-primary'])?>
+        </td>
+    </tr>
 </table>
-<?=\yii\widgets\LinkPager::widget([
-    'pagination'=>$pager,
-])?>
+<?php
+/**
+ * @var $this \yii\web\View
+ */
+echo \yii\widgets\LinkPager::widget(['pagination' => $pager]);
+$html=\yii\helpers\Url::to(['goods/delete']).'?id=';
+$js=<<<JS
+    $('.btn-danger').on('click',function() {
+        if (confirm('是否确定删除')){
+            var id =$(this).attr('id');
+        $.getJSON('$html'+id,function(data) {
+            console.debug(data.status);
+            if (data.status!=0){
+                var name='#goods'+id;
+                $(name).fadeOut();
+                alert('删除成功');
+            }
+            else{
+                alert('删除失败');
+            }
+        })
+        }
+    });
+JS;
+$this->registerJs($js);

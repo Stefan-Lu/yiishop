@@ -26,14 +26,27 @@ class UserController extends Controller
     }
     //用户列表
     public function actionIndex(){
+        $authManager=\Yii::$app->authManager;
         $users = User::find()->all();
+        foreach ($users as &$user){
+            $res = $authManager->getRolesByUser($user->id);
+            foreach ($res as $k=>$v){
+               $user->roles[] = $k;
+            }
+
+        }
+        //var_dump($users);die;
         return $this->render('index',['users'=>$users]);
     }
     public function actionAdd(){
         $request = new Request();
         $user = new User();
+        $authManager=\Yii::$app->authManager;
+        $roles = $authManager->getRoles();
+        //var_dump($roles);die;
         if($request->isPost){
             $user->load($request->post());
+            //var_dump($user->roles);die;
             if($user->validate()){
                 //将传过来的密码进行加密
                 $user->password_hash = \Yii::$app->security->generatePasswordHash($user->password_hash);//进行加密
@@ -41,6 +54,12 @@ class UserController extends Controller
                 $user->auth_key = uniqid();
                 $user->status = 1;
                 $user->save();
+                if ($user->roles){
+                    foreach ($user->roles as $name){
+                        $role = $authManager->getRole($name);
+                        $authManager->assign($role,$user->getId());
+                    }
+                }
                 \Yii::$app->session->setFlash("success","创建成功");
                 return $this->redirect(['index']);
             }
@@ -49,11 +68,20 @@ class UserController extends Controller
                 exit;
             }
         }
-        return $this->render('add',['user'=>$user]);
+        return $this->render('add',['user'=>$user,'roles'=>$roles]);
     }
     public function actionEdit($id){
         $request = new Request();
         $user = User::findOne(['id'=>$id]);
+        //角色
+        $authManager = \Yii::$app->authManager;
+        $roles = $authManager->getRoles();
+        //回显
+        $roleName=$authManager->getRolesByUser($id);
+        foreach ($roleName as $name){
+            $user->roles[]=$name->name;
+        }
+
         if($request->isPost){
             $user->load($request->post());
             if($user->validate()){
@@ -61,6 +89,14 @@ class UserController extends Controller
                 $user->auth_key = uniqid();
                 $user->password_hash = \Yii::$app->security->generatePasswordHash($user->password_hash);//进行加密
                 $user->save();
+                $authManager->revokeAll($id);
+                if ($user->roles){
+                    foreach ($user->roles as $name){
+                        $role=$authManager->getRole($name);
+                        $authManager->assign($role,$id);
+                    }
+                }
+
                 \Yii::$app->session->setFlash("success",'修改成功');
                 return $this->redirect(['index']);
             }
@@ -70,7 +106,7 @@ class UserController extends Controller
             }
         }
         $user->password_hash = '';
-        return $this->render('edit',['user'=>$user]);
+        return $this->render('edit',['user'=>$user,'roles'=>$roles]);
 
     }
     public function actionDelete($id){

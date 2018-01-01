@@ -37,21 +37,14 @@ class MenuController extends Controller{
         $request=\Yii::$app->request;
         $menus = Menu::find()->where(['parent_id'=>0])->asArray()->all();
 
-        $urls=[
-            ['val'=>'','name'=>'请选择路由'],
-            ['val'=>'goods/add','name'=>'goods/add'],
-            ['val'=>'goods/update','name'=>'goods/update'],
-            ['val'=>'goods/delete','name'=>'goods/delete'],
-            ['val'=>'brand/add','name'=>'brand/add'],
-            ['val'=>'brand/update','name'=>'brand/update'],
-            ['val'=>'brand/delete','name'=>'brand/delete'],
-            ['val'=>'article/add','name'=>'article/add'],
-            ['val'=>'article/update','name'=>'article/update'],
-            ['val'=>'article/delete','name'=>'article/delete'],
-            ['val'=>'user/add','name'=>'user/add'],
-            ['val'=>'user/update','name'=>'user/update'],
-            ['val'=>'user/delete','name'=>'user/delete'],
-        ];
+        //从权限表中取得所有路由
+        $authManager=\Yii::$app->authManager;
+        $permission=$authManager->getPermissions();
+        $urls = [];
+        foreach ($permission as $item){
+            $urls[] = ['val'=>$item->name,'name'=>$item->name];
+        }
+
         if ($request->isPost){
             $model->load($request->post());
             if ($model->validate()){
@@ -70,22 +63,16 @@ class MenuController extends Controller{
         $model=Menu::findOne(['id'=>$id]);
         $request=\Yii::$app->request;
         $menus=Menu::find()->where(['parent_id'=>0])->asArray()->all();
-        $urls=[
-            ['val'=>'','name'=>'请选择路由'],
-            ['val'=>'goods/add','name'=>'goods/add'],
-            ['val'=>'goods/update','name'=>'goods/update'],
-            ['val'=>'goods/delete','name'=>'goods/delete'],
-            ['val'=>'brand/add','name'=>'brand/add'],
-            ['val'=>'brand/update','name'=>'brand/update'],
-            ['val'=>'brand/delete','name'=>'brand/delete'],
-            ['val'=>'article/add','name'=>'article/add'],
-            ['val'=>'article/update','name'=>'article/update'],
-            ['val'=>'article/delete','name'=>'article/delete'],
-            ['val'=>'article/delete','name'=>'article/delete'],
-            ['val'=>'user/add','name'=>'user/add'],
-            ['val'=>'user/update','name'=>'user/update'],
-            ['val'=>'user/delete','name'=>'user/delete'],
-        ];
+
+        //从权限表中取得所有路由
+        $authManager=\Yii::$app->authManager;
+        $permission=$authManager->getPermissions();
+        $urls = [];
+        foreach ($permission as $item){
+            $urls[] = ['val'=>$item->name,'name'=>$item->name];
+        }
+
+
         if ($request->isPost) {
             $model->load($request->post());
            //var_dump( $model->checkPid($id));die;
@@ -93,6 +80,8 @@ class MenuController extends Controller{
                 $model->save();
                 \Yii::$app->session->setFlash('success', '修改成功');
                 return $this->redirect(Url::to(['menu/index']));
+            }else{
+                var_dump($model->getErrors());die;
             }
         }
         return $this->render('add',['model'=>$model,'menus'=>$menus,'urls'=>$urls]);

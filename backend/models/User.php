@@ -19,6 +19,7 @@ use yii\web\IdentityInterface;
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public $roles;
     /**
      * @inheritdoc
      */
@@ -37,6 +38,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             [['status', 'last_login_time'], 'integer'],
             [['username', 'password_hash', 'email', 'head', 'last_login_ip'], 'string', 'max' => 255],
             [['username'], 'unique'],
+            [['roles'],'safe'],
             [['email'], 'unique'],
         ];
     }
@@ -53,6 +55,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'email' => '邮箱',
             'status' => '状态',
             'head' => '头像',
+            'roles' => '权限分配',
             'last_login_time' => '最后登陆的时间',
             'last_login_ip' => '最后登陆的ip',
         ];
@@ -121,5 +124,26 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
+    }
+
+    public function getMenu()
+    {
+        $menuItems=[];
+        $parents=Menu::find()->where(['parent_id'=>0])->all();
+        foreach ($parents as $parent){
+            $items=[];
+            $rows=Menu::find()->where(['parent_id'=>$parent->id])->all();
+            //var_dump($rows);die;
+            foreach ($rows as $row){
+                if (Yii::$app->user->can($row->route)){
+                    $items[]=['label' => $row->name, 'url' =>[$row->route]];
+                }
+            }
+            if ($items){
+                $menuItems[]=['label'=>$parent->name,'items'=>$items];
+            }
+        }
+        //var_dump($menuItems);die;
+        return $menuItems;
     }
 }

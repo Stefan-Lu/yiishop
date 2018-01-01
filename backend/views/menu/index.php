@@ -25,12 +25,12 @@
 /**
  * @var $this \yii\web\View
  */
-$html=\yii\helpers\Url::to(['menu/delete']).'?id=';
+
 $js=<<<JS
     $('.table').on('click','.btn-danger',function() {
          var tr = $(this).closest('tr');
         if(confirm('是否确定删除该记录？')){
-            $.post('del',{id:tr.attr('data-id')},function(){
+            $.post('/menu/del',{id:tr.attr('data-id')},function(){
                 tr.fadeOut();
             });
         }

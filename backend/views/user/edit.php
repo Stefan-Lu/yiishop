@@ -9,7 +9,9 @@
 $form = \yii\bootstrap\ActiveForm::begin();
 //----------------------------------------------------
 //头像
+echo $form->field($user,'username')->textInput();
 echo $form->field($user,"head")->hiddenInput();
+
 $this->registerCssFile("@web/webuploader/webuploader.css");
 $this->registerJsFile("@web/webuploader/webuploader.js",[
     'depends'=>\yii\web\JqueryAsset::className()
@@ -18,7 +20,6 @@ echo
 <<<HTML
     <div id="uploader-demo">
     <!--用来存放item-->
-    <img src="$user->head" width="90px">
     <div id="fileList" class="uploader-list"></div>
     <div id="filePicker">选择图片</div>
 </div>
@@ -60,9 +61,7 @@ uploader.on( 'uploadSuccess', function( file,response) {
 JS;
 $this->registerJs($js);
 //---------------------------------------------------
-echo $form->field($user,'username')->textInput();
-echo $form->field($user,'password_hash')->passwordInput();
 echo $form->field($user,'email')->textInput();
-echo $form->field($user,'status')->radioList([1=>'启用',2=>'禁用']);
-echo "<button>确认</button>";
+echo $form->field($user,'roles')->inline()->checkboxList(\yii\helpers\ArrayHelper::map($roles,'name','name'));
+echo '<button type="submit" class="btn btn-primary">提交</button>';
 \yii\bootstrap\ActiveForm::end();

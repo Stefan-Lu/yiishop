@@ -1,138 +1,137 @@
 <?php
 /**
- * @property integer $id
- * @property string $name
- * @property string $sn
- * @property string $logo
- * @property integer $goods_category_id
- * @property integer $brand_id
- * @property string $market_price
- * @property string $shop_price
- * @property integer $stock
- * @property integer $is_on_sale
- * @property integer $status
- * @property integer $sort
- * @property integer $create_time
- * @property integer $view_times
+ * @var $this \yii\web\View
  */
-$form = \yii\bootstrap\ActiveForm::begin();
-echo $form->field($good,"name")->textInput();
-echo $form->field($good,"goods_category_id")->hiddenInput();//分类表
-//-------------------------------------------------------
-//分类信息
-$this->registerCssFile("@web/zTree/css/zTreeStyle/zTreeStyle.css");
-$this->registerJsFile("@web/zTree/js/jquery.ztree.core.js",[
-    'depends'=>\yii\web\JqueryAsset::className()
-]);
-$nodes = \backend\models\Goods::getNodes();//获取节点
-$js =<<<JS
-var zTreeObj;
-   // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
-   var setting = {
-	data: {
-		simpleData: {
-			enable: true,
-			idKey: "id",
-			pIdKey: "parent_id",
-			rootPId: 0
-		}
-	},
-	view: {
-		fontCss : {color:"red"}
-	},
-	callback:{
-	    onClick:function(event, treeId, treeNode) {
-	      //点击事件 获取该节点的id 赋值给输入框
-	     $("#goods-goods_category_id").val(treeNode.id);
-	    }
-	}
-};
-var zNodes = {$nodes};
-   // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
-    $(document).ready(function(){
-      zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
-      zTreeObj.expandAll(true);
-      //如何回显需要获得当前选中的id
-      var id = $("#goodscategory-id").val();
-      //console.debug(id);
-      var node = zTreeObj.getNodeByParam("id",id,null);
-      zTreeObj.selectNode(node);
-   });
-JS;
-$this->registerJs($js);
+$form=\yii\bootstrap\ActiveForm::begin();
+echo $form->field($model,'name')->textInput();
+echo $form->field($model,'logo')->hiddenInput();
+//=============================图片上传
+$this->registerCssFile('@web/webuploader/webuploader.css');
+$this->registerJsFile('@web/webuploader/webuploader.js', ['depends' => \yii\web\JqueryAsset::className()]);
+//=============================分类
+//注册css js
+$this->registerCssFile('@web/zTree/css/zTreeStyle/zTreeStyle.css');
+$this->registerJsFile('@web/zTree/js/jquery.ztree.core.js',['depends'=>\yii\web\JqueryAsset::className()]);
+//=============================上传图片
 echo <<<HTML
-<div>
-   <ul id="treeDemo" class="ztree"></ul>
-</div>
-HTML;
-
-
-//-------------------------------------------------------
-echo $form->field($good,'brand_id')->dropDownList($brands);//品牌表
-echo $form->field($good,"market_price")->textInput(['type'=>'number']);
-echo $form->field($good,"stock")->textInput(['type'=>'number']);
-echo $form->field($good,"shop_price")->textInput(['type'=>'number']);
-echo $form->field($good,"is_on_sale")->radioList([1=>'上架',2=>'下架']);
-echo $form->field($good,"status")->dropDownList([1=>'显示',2=>'回收站']);
-echo $form->field($good,"sort")->textInput(["type"=>'number']);
-echo $form->field($good,"logo")->hiddenInput();
-$this->registerCssFile("@web/webuploader/webuploader.css");
-$this->registerJsFile("@web/webuploader/webuploader.js",[
-    'depends'=>\yii\web\JqueryAsset::className()
-]);
-echo
-<<<HTML
+        <!--dom结构部分-->
     <div id="uploader-demo">
-    <!--用来存放item-->
-    <div id="fileList" class="uploader-list"></div>
-    <div id="filePicker">选择图片</div>
-</div>
-<img id = 'img'>
+        <!--用来存放item-->
+        <div id="fileList" class="uploader-list">
+        </div>
+        <div id="filePicker">选择图片</div>
+    </div>
 HTML;
-$upload_url = \yii\helpers\Url::to(['goods/upload']);//处理地址
-$js =
-    <<<JS
+//=========================end
+//=========================商品分类
+echo $form->field($model,'goods_category_id')->hiddenInput();
+echo <<<Ztree
+    <div>
+       <ul id="treeDemo" class="ztree"></ul>
+    </div>
+Ztree;
+$Nodes=\backend\models\GoodsCategory::getNodes();
+//=========================end
+//js部分
+$html=\yii\helpers\Url::to(['goods/upload']);
+$js=<<<JS
+        // 初始化Web Uploader
         var uploader = WebUploader.create({
-    // 选完文件后，是否自动上传。
-    auto: true,
+        
+            // 选完文件后，是否自动上传。
+            auto: true,
+        
+            // swf文件路径
+            swf: '/webuploader/Uploader.swf',
+        
+            // 文件接收服务端。
+            server: '{$html}',
+        
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#filePicker',
+        
+            // 只允许选择图片文件。
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/gif,image/jpg,image/jpeg,image/bmp,image/png'
+            }
+        });
 
-    // swf文件路径
-    swf: 'webuploader/Uploader.swf',
 
-    // 文件接收服务端。
-    server: '{$upload_url}',
-
-    // 选择文件的按钮。可选。
-    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
-    pick: '#filePicker',
-
-    // 只允许选择图片文件。
-    accept: {
-        title: 'Images',
-        extensions: 'gif,jpg,jpeg,bmp,png',
-        mimeTypes: 'image/*'
-    }
-});
-//文件上传成功
-uploader.on( 'uploadSuccess', function( file,response) {
-    //$( '#'+file.id ).addClass('');
-    //response图片地址
-    //console.debug(response.url);
-    $("#img").attr("src",response.url);
-    $("#goods-logo").val(response.url);
-    //console.debug($("#goods-logo").val());
-});
+       // 当有文件添加进来的时候
+        uploader.on( 'fileQueued', function( file ) {
+            var li = $(
+                    '<div id="' + file.id + '" class="file-item thumbnail">' +
+                        '<img>' +
+                        '<div class="info">' + file.name + '</div>' +
+                    '</div>'
+                    ),
+                img = li.find('img');
+        
+        
+            // list为容器jQuery实例
+            $('#fileList').append( li );
+        
+            // 创建缩略图
+            // 如果为非图片文件，可以不用调用此方法。
+            // thumbnailWidth x thumbnailHeight 为 100 x 100
+            uploader.makeThumb( file, function( error, src ) {
+                if ( error ) {
+                    img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+        
+                img.attr( 'src', src );
+            }, thumbnailWidth=100, thumbnailHeight=100 );
+        });
+    
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+            uploader.on( 'uploadSuccess', function( file,response ) {
+                 $( '#'+file.id ).addClass('upload-state-done');
+                 $('#goods-logo').val(response.url);
+            });
+            
+            
+            var zTreeObj;
+           // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+           var setting = {
+               data: {
+		        simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "parent_id",
+                rootPId: 0
+		            }
+	            },
+	            callback: {
+		            onClick: function(event, treeId, treeNode) {
+		                $('#goods-goods_category_id').val(treeNode.id);
+		            }
+	            }
+           };
+           // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
+              var zNodes={$Nodes};
+              zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+              zTreeObj.expandAll(true);
+              var node = zTreeObj.getNodeByParam("id",'$model->goods_category_id', null);
+              zTreeObj.selectNode(node);
 JS;
 $this->registerJs($js);
-//--------------------------------------------------------------
-//商品详情 富文本编辑器
-echo $form->field($content, 'content')->widget('kucha\ueditor\UEditor',[
 
-    'options'=>[
-        'initialFrameWidth' => 850,
-        //'initialFrameHeight' => 850,
-    ]
+echo $form->field($model,'brand_id')->dropDownList(\yii\helpers\ArrayHelper::map($brands,'id','name'));
+echo $form->field($model,'market_price')->textInput(['type'=>'tel']);
+echo $form->field($model,'shop_price')->textInput(['type'=>'tel']);
+echo $form->field($model,'stock')->textInput(['type'=>'tel']);
+echo $form->field($model,'is_on_sale')->inline()->radioList(['下架','上架']);
+
+echo $form->field($model,'sort')->textInput(['type'=>'tel']);
+echo $form->field($introModel,'content')->widget('kucha\ueditor\UEditor',[
+    'options' => [
+        'initialFrameHeight'=>500
+    ],
 ]);
-//--------------------------------------------------------------
-echo "<button class='btn-group-lg' type='submit'>确认</button>";
+
+echo \yii\bootstrap\Html::submitButton('保存',['class'=>'btn btn-primary']);
 \yii\bootstrap\ActiveForm::end();

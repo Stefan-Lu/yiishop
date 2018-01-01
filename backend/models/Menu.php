@@ -43,6 +43,10 @@ class Menu extends \yii\db\ActiveRecord
         if($pid == 0){
             return true;
         }
+        if($id == $pid){
+            $this->addError('parent_id','不能修改到自己的子目录中');
+            return false;
+        }
         if(self::findOne(['id'=>$id])->parent_id == 0){
             $res = self::findBySql('select count(*) from menu where parent_id ='.$id)->column()[0];
            // var_dump($res);die;
@@ -51,7 +55,7 @@ class Menu extends \yii\db\ActiveRecord
             }
             return !$res;
         }
-
+        return true;
     }
 
 

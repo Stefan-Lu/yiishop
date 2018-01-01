@@ -51,7 +51,7 @@ class Goods extends \yii\db\ActiveRecord
             [['market_price', 'shop_price'], 'number'],
             ['name', 'string', 'max' => 20],
             //[['logo'], 'string', 'max' => 255],
-            [['logo','status','brand_id'],'safe'],
+            [['logo','brand_id'],'safe'],
         ];
     }
 
@@ -71,7 +71,7 @@ class Goods extends \yii\db\ActiveRecord
             'shop_price' => '商品价格',
             'stock' => '库存',
             'is_on_sale' => '是否上架',
-            'status' => '状态',
+
             'sort' => '排序',
             //'create_time' => 'Create Time',
            // 'view_times' => '浏览次数',
@@ -96,6 +96,7 @@ class Goods extends \yii\db\ActiveRecord
         //用于找到节点
         $nodes = GoodsCategory::find()->select(["id",'parent_id','name'])->asArray()->all();
         //array_unshift($nodes,['id'=>0,'parent_id'=>0,'name'=>])
+        array_unshift($nodes,['name'=>'顶级分类','id'=>0,'parent_id'=>0]);
         return json_encode($nodes);
     }
 }

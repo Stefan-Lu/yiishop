@@ -9,13 +9,14 @@
 namespace backend\controllers;
 
 
-/*use backend\filters\RbacFilter;*/
+use backend\filter\RbacFilter;
 use backend\models\Brand;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
 use backend\models\GoodsDayCount;
 use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
+use backend\models\GoodsSearchForm;
 use backend\models\GoodsSerch;
 use Qiniu\Auth;
 use Qiniu\Storage\UploadManager;
@@ -49,72 +50,75 @@ class GoodsController extends Controller
             ]
         ];
     }
-    public function actionIndex(){
-        $query = Goods::find()->where(['=','status',1]);
-        $arr = [];
-        $cates = GoodsCategory::find()->select(['id','name'])->all();
-        foreach ($cates as $cate){
-            $arr[$cate->id] = $cate->name;
+    public function actionIndex()
+    {
+        $goods = new GoodsSearchForm();
+        $request = \Yii::$app->request;
+        $query = Goods::find()->where(['status' => 0]);
+
+        $goods->load($request->get());
+        if (count($goods)) {
+            $search = [];
+            if ($goods->name) {
+                $search = ['and', ['like', 'name', $goods->name],];
+            }
+            if ($goods->sn) {
+                $search = ['and', ['like', 'sn', $goods->sn],];
+            }
+            if ($goods->minPrice) {
+                $search = ['and', ['>=', 'shop_price', $goods->minPrice]];
+            }
+            if ($goods->maxPrice) {
+                $search = ['and', ['<=', 'shop_price', $goods->maxPrice]];
+            }
         }
-        $pager = new Pagination(
-            [
-                'totalCount'=>$query->count(),
-                'defaultPageSize'=>2
-            ]);
-        //搜索功能
-        $request = new Request();
-        $serch = new GoodsSerch();
-        $serch->load($request->get());
-        $name = isset($serch->name) ? $serch->name : '';
-        $sn = isset($serch->sn) ? $serch->sn :'';
-        $goods = $query->andWhere(['like','name',$name])->andWhere(['like','sn',$sn])->limit($pager->limit)->offset($pager->offset)->all();
-        return $this->render("index",['goods'=>$goods,'arr'=>$arr,'pager'=>$pager,'serch'=>$serch]);
+        //分页
+        $query=$query->andWhere($search);
+        $pager = new Pagination([
+            'totalCount' => $query->count(),
+            'pageSize' => 7,
+        ]);
+
+        $rows = $query->limit($pager->limit)->offset($pager->offset)->all();
+        return $this->render('index', ['goods' => $goods, 'rows' => $rows, 'pager' => $pager]);
     }
-    public function actionAdd(){
-        $request = new Request();
-        $good = new Goods();
-        $content = new GoodsIntro();
-        if($request->isPost){
-            $good->load($request->post());
-            //var_dump($good);
-            $content->load($request->post());
-            if($good->validate()){
-                //添加
-                $count = Goods::find()->count();
-                $count = $count+1;
-                $good->create_time = time();//创建时间
-                //同时更新记录表的数据
-                $time = date('Y-m-d',time());
-                $mes = GoodsDayCount::find()->where(['=','day',$time])->count();//等于当前时间
-                $num = GoodsDayCount::findOne(['day'=>$time])->count;//查到当前时间的添加数
-                if($mes){//存在
-                    $num+=1;//自增1
-                    GoodsDayCount::updateAll(['count'=>$num],['day'=>$time]);//进行修改
+    public function actionAdd()
+    {
+        $model = new Goods();
+        $introModel = new GoodsIntro();
+        $brands = Brand::find()->select(['id', 'name'])->where(['status'=>[1]])->all();
+        array_unshift($brands,['id'=>'','name'=>'【请选择】']);
+        $request = \Yii::$app->request;
+        if ($request->isPost) {
+            $model->load($request->post());
+            $introModel->load($request->post());
+            $date=date('Y-m-d');
+            $goodsDayCount = GoodsDayCount::findOne(['day' => $date]);
+            if ($model->validate()) {
+                if ($goodsDayCount == null) {
+                    $goodsDayCount = new GoodsDayCount();
+                    $goodsDayCount->day = $date;
+                    $goodsDayCount->count = 1;
+                } else {
+                    $goodsDayCount->count += 1;
                 }
-                else{
-                    $num=1;
-                    //不存在该时间则需要添加一条
-                    $sql = "insert into goods_day_count set `day`='{$time}', `count` = {$num}";//进行添加
-                    $query = \Yii::$app->db;
-                    $query->createCommand($sql)->execute();
-                }
-                $count = sprintf('%05s', $count);
-                $good->sn = date("Ymd",time()).$count;//当前第几个(存入货号)
-                $good->save();
-                $goods_id = \Yii::$app->db->lastInsertID;
-                $content->goods_id = $goods_id;
-                $content->save();
-                \Yii::$app->session->setFlash("success","添加成功");
-                return $this->redirect(["goods/index"]);
-            }
-            else{
-                var_dump($good->getErrors());
-                exit;
+                //货号新增商品自动生成sn,规则为年月日+今天的第几个商品,比如2016053000001
+                //查询添加数
+                $model->sn = date('Ymd') . str_pad($goodsDayCount->count, 5, 0, 0);
+                $model->view_times = 0;
+                $model->status = 0;
+                $model->create_time = time();
+                $model->save();
+                $introModel->save();
+                $goodsDayCount->save();
+                \Yii::$app->session->setFlash('success', '新增成功');
+                return $this->redirect(['index']);
+            } else {
+                var_dump($model->getErrors());
             }
         }
-        $brand = Brand::find()->all();
-        $brands = ArrayHelper::map($brand,"id","name");//商品分类
-        return $this->render("add",['good'=>$good,'brands'=>$brands,'content'=>$content]);
+
+        return $this->render('add', ['model' => $model, 'introModel' => $introModel, 'brands' => $brands]);
     }
     public function actionEdit($id){
         $request = new Request();
@@ -143,18 +147,15 @@ class GoodsController extends Controller
         Goods::updateAll(['status'=>2,],['id'=>$id]);
 
     }
-    public function actionPre($id){
-        //预览功能
-        $good = GoodsIntro::findOne(['goods_id'=>$id]);
-        return $this->render('pre',['good'=>$good]);
-    }
-    public function actionPic($id){
-        //用来传入商品图片
-        $gallery = new GoodsGallery();
-        $pics = GoodsGallery::find()->where(['=','goods_id',$id])->all();
-        $gallery->goods_id = $id;
-        return $this->render("pic",['gallery'=>$gallery,'pics'=>$pics]);
+    public function actionShow($id){
+        $row=GoodsIntro::findOne(['goods_id'=>$id]);
 
+        return $this->render('show',['row'=>$row]);
+    }
+    public function actionGallery($id)
+    {
+        $rows = GoodsGallery::findAll(['goods_id' => $id]);
+        return $this->render('gallery', ['rows' => $rows, 'goods_id' => $id]);
     }
     public function actionCeshi(){//处理图片
         //插入到数据库中
@@ -205,7 +206,7 @@ class GoodsController extends Controller
             } else {//上传成功
                 //http://p1ax3rlkk.bkt.clouddn.com//upload/1.jpg
                 //var_dump($ret);
-                $url = "http://{$domin}/{$key}";//凭借路径名
+                $url = "http://{$domian}/{$key}";//凭借路径名
                 return json_encode(['url'=>$url]);
             }
         }

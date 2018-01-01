@@ -63,5 +63,6 @@ JS;
 $this->registerJs($js);
 //---------------------------------------------------
 echo $form->field($user,'email')->textInput();
+echo $form->field($user,'roles')->inline()->checkboxList(\yii\helpers\ArrayHelper::map($roles,'name','name'));
 echo '<button type="submit" class="btn btn-primary">提交</button>';
 \yii\bootstrap\ActiveForm::end();
