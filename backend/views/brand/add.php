@@ -1,3 +1,5 @@
+<h1>品牌添加</h1>
+<hr>
 <?php
 /**
  * @var $this \yii\web\View

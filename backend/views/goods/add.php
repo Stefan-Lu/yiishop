@@ -1,7 +1,10 @@
+<h1>商品添加</h1>
+<hr>
 <?php
 /**
  * @var $this \yii\web\View
  */
+
 $form=\yii\bootstrap\ActiveForm::begin();
 echo $form->field($model,'name')->textInput();
 echo $form->field($model,'logo')->hiddenInput();

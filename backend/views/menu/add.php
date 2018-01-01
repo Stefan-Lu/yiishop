@@ -1,3 +1,5 @@
+<h1>菜单添加</h1>
+<hr>
 <?php
 $form=\yii\bootstrap\ActiveForm::begin();
     echo $form->field($model,'name')->textInput();

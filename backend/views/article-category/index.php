@@ -1,3 +1,5 @@
+<h1>文章列表</h1>
+<hr>
 <table class="table">
     <tr>
         <th>ID</th>

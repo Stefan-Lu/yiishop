@@ -2,20 +2,21 @@
     tr td,th{
         text-align: center;
     }
-    .btn-warning{
+    .btn-success{
         position: relative;
         top: -6px;
-        left: 200px;
+        left: 50px;
     }
 </style>
 <h1>商品列表</h1>
+<hr>
 <?php
 $form=\yii\bootstrap\ActiveForm::begin(['method' => 'get','action' => \yii\helpers\Url::to(['goods/index']),'options' => ['class'=>'form-inline','role'=>'form'],]);
     echo $form->field($goods,'name')->textInput(['placeholder'=>'商品名称',])->label('');
     echo $form->field($goods,'sn')->textInput(['type'=>'tel','placeholder'=>'商品货号'])->label('');
-    echo $form->field($goods,'minPrice')->textInput(['type'=>'tel','placeholder'=>'最小价格'])->label('');
-    echo $form->field($goods,'maxPrice')->textInput(['type'=>'tel','placeholder'=>'最大价格'])->label('');
-    echo \yii\bootstrap\Html::submitButton('搜索<span class="glyphicon glyphicon-search"></span>',['class'=>'btn btn-warning']);
+   /* echo $form->field($goods,'minPrice')->textInput(['type'=>'tel','placeholder'=>'最小价格'])->label('');
+    echo $form->field($goods,'maxPrice')->textInput(['type'=>'tel','placeholder'=>'最大价格'])->label('');*/
+    echo \yii\bootstrap\Html::submitButton('搜索<span class="glyphicon glyphicon-search"></span>',['class'=>'btn btn-success']);
 \yii\bootstrap\ActiveForm::end();
 ?>
 
@@ -41,7 +42,7 @@ $form=\yii\bootstrap\ActiveForm::begin(['method' => 'get','action' => \yii\helpe
             <td><?php echo $row->view_times?>次</td>
             <td>
                 <?php echo \yii\bootstrap\Html::a('相册',\yii\helpers\Url::to(['goods/gallery','id'=>$row->id]),['class'=>'btn btn-info btn-sm'])?>
-                <?php echo \yii\bootstrap\Html::a('预览',\yii\helpers\Url::to(['goods/show','id'=>$row->id]),['class'=>'btn btn-success btn-sm'])?>
+                <?php echo \yii\bootstrap\Html::a('预览',\yii\helpers\Url::to(['goods/show','id'=>$row->id]),['class'=>'btn btn-warning btn-sm'])?>
                 <?php echo \yii\bootstrap\Html::a('修改',\yii\helpers\Url::to(['goods/update','id'=>$row->id]),['class'=>'btn btn-primary btn-sm'])?>
                 <?php echo \yii\bootstrap\Html::submitButton('删除',['class'=>'btn btn-danger btn-sm','id'=>$row->id])?>
             </td>

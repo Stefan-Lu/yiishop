@@ -1,3 +1,5 @@
+<h1>管理员添加</h1>
+<hr>
 <?php
 /**
  * Created by PhpStorm.

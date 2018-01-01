@@ -1,13 +1,5 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: YFan
- * Date: 2017/12/24
- * Time: 10:33
- */
-//用户列表首页
-?>
-
+<h1>管理员列表</h1>
+<hr>
 <table class="table table-bordered table-hover">
     <tr>
         <th>编号</th>

@@ -3,6 +3,8 @@
         text-align: center;
     }
 </style>
+<h1>商品类别列表</h1>
+<hr>
 <table class="table table-bordered">
     <tr>
         <th>名称</th>

@@ -1,3 +1,5 @@
+<h1>商品相册</h1>
+<hr>
 <?php
 /**
  * @var $this \yii\web\View

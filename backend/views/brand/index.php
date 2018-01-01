@@ -1,4 +1,5 @@
-
+<h1>品牌列表</h1>
+<hr>
 <table class="table">
     <tr>
         <th>ID</th>

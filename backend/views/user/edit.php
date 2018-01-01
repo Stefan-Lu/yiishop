@@ -1,3 +1,5 @@
+<h1>修改管理员信息</h1>
+<hr>
 <?php
 /**
  * Created by PhpStorm.

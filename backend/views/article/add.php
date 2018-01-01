@@ -1,3 +1,5 @@
+<h1>文章添加</h1>
+<hr>
 <?php
 /**
  * @var $this \yii\web\View

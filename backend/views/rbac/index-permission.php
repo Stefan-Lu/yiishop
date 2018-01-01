@@ -3,6 +3,8 @@
         text-align: center;
     }
 </style>
+<h1>权限列表</h1>
+<hr>
 <table class="table table-bordered" id="table_id_example">
     <thead>
         <tr>
@@ -24,7 +26,7 @@
     <?php endforeach;?>
     </tbody>
     <tr>
-        <td colspan="3"><?php echo \yii\helpers\Html::a('添加权限',\yii\helpers\Url::to(['rbac/add-permission']),['class'=>'btn btn-info btn-lg'])?></td>
+        <td colspan="3" ><?php echo \yii\helpers\Html::a('添加权限',\yii\helpers\Url::to(['rbac/add-permission']),['class'=>'btn btn-primary'])?></td>
     </tr>
 </table>
 <?php
