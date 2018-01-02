@@ -41,11 +41,11 @@ class GoodsCategoryController extends \yii\web\Controller {
                 }else{
                     $model->makeRoot();
                 }
-                \Yii::$app->session->setFlash('success','新增商品分类成功');
+                \Yii::$app->session->setFlash('success','修改商品分类成功');
                 return $this->redirect(Url::to(['goods-category/index']));
             }
         }
-        return $this->render('alter',['model'=>$model]);
+        return $this->render('add',['model'=>$model]);
     }
 
     public function actionDelete($id){

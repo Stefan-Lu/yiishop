@@ -24,9 +24,9 @@ foreach ($rows as $row):
 </td></tr>';
 endforeach;
 echo '</table>';
-$html=\yii\helpers\Url::to(['goods-gallery/upload']);   //上传地址
-$alterHtml=\yii\helpers\Url::to(['goods-gallery/add']); //添加地址
-$delHtml=\yii\helpers\Url::to(['goods-gallery/delete']).'?id='; //删除地址
+$upload=\yii\helpers\Url::to(['goods-gallery/upload']);   //上传地址
+$addurl=\yii\helpers\Url::to(['goods-gallery/add']); //添加地址
+$delurl=\yii\helpers\Url::to(['goods-gallery/delete']).'?id='; //删除地址
 
 $js=<<<JS
 // 初始化Web Uploader
@@ -39,7 +39,7 @@ $js=<<<JS
                 swf: '/webuploader/Uploader.swf',
             
                 // 文件接收服务端。
-                server: '$html',
+                server: '$upload',
             
                 // 选择文件的按钮。可选。
                 // 内部根据当前运行是创建，可能是input元素，也可能是flash.
@@ -71,10 +71,8 @@ $js=<<<JS
 // 文件上传成功，给item添加成功class, 用样式标记上传成功。
             uploader.on( 'uploadSuccess', function( file,response ) {
                  $( '#'+file.id ).addClass('upload-state-done');
-                 $.post('$alterHtml',{"goods_id":$goods_id,"path":response.url},function(data) {
-                     console.debug(data);
-                    if (data.status!=0){
-                        //追加html
+                 $.post('$addurl',{"goods_id":$goods_id,"path":response.url},function(data) {
+                  if (data.status != 0){
                         var str='<tr id="gallery'+data.status+'" data-id="'+data.status+'"><td><img src="'+response.url+'"></td><td><button type="submit" class="btn btn-danger btn-sm">删除</button></td></tr>';
                         $('.table'). append(str);
                     }
@@ -98,13 +96,12 @@ uploader.on( 'uploadError', function( file ) {
 });
 
 $('.table').on('click','.btn-danger',function() {
-    if (confirm('此操作会强制删除图片!是否确定删除?')){
+    if (confirm('确定删除?')){
             var id=$(this).closest('tr').attr('data-id');
-            $.getJSON('$delHtml'+id,function(data) {
+            $.getJSON('$delurl'+id,function(data) {
             if (data.status>0){
                 var tab='#gallery'+(data.status);
                 $(tab).fadeOut();
-                alert('删除成功');
             }
             else{
                 alert('删除失败');

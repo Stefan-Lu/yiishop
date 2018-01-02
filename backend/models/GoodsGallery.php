@@ -27,9 +27,7 @@ class GoodsGallery extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'goods_id'], 'required'],
-            [['id', 'goods_id'], 'integer'],
-            [['path'], 'string', 'max' => 255],
+           [['goods_id','path'],'required']
         ];
     }
 

@@ -64,7 +64,7 @@ class ArticleController extends Controller
     public function actionEdit($id){
         $request = new Request();
         $article = Article::findOne(['id'=>$id]);
-        $detail = ArticleDetail::findOne(['id'=>$id]);
+        $detail = ArticleDetail::findOne(['article_id'=>$id]);
         $categorys = ArticleCategory::find()->all();
         $options = ArrayHelper::map($categorys,'id','name');
         if($request->isPost){

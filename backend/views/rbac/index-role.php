@@ -26,7 +26,7 @@
     <?php endforeach;?>
     </tbody>
     <tr>
-        <td colspan="3"><?php echo \yii\helpers\Html::a('添加权限',\yii\helpers\Url::to(['rbac/add-role']),['class'=>'btn btn-info btn-lg'])?></td>
+        <td colspan="3"><?php echo \yii\helpers\Html::a('添加权限',\yii\helpers\Url::to(['rbac/add-role']),['class'=>'btn btn-primary'])?></td>
     </tr>
 </table>
 <?php

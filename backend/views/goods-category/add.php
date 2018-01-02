@@ -42,6 +42,8 @@ $js =<<<JS
 			zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
 			zTreeObj.expandAll(true);
 			
+			var node=zTreeObj.getNodeByParam('id','$model->parent_id',null);
+            zTreeObj.selectNode(node);
 	
 JS;
 $this->registerJs($js);

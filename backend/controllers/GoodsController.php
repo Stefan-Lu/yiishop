@@ -120,28 +120,29 @@ class GoodsController extends Controller
 
         return $this->render('add', ['model' => $model, 'introModel' => $introModel, 'brands' => $brands]);
     }
-    public function actionEdit($id){
-        $request = new Request();
-        $good = Goods::findOne(['id'=>$id]);
-        $content = GoodsIntro::findOne(['goods_id'=>$id]);
-        if($request->isPost){
-            $content->load($request->post());
-            $good->load($request->post());
-            if($good->validate()){
-                $good->create_time = time();
-                $good->save();
-                $content->save();
-                \Yii::$app->session->setFlash("success",'添加成功');
+    public function actionEdit($id)
+    {
+        $model = Goods::findOne($id);
+        $introModel = GoodsIntro::findOne($id);
+        $brands = Brand::find()->select(['id', 'name'])->all();
+        array_unshift($brands,['id'=>'','name'=>'【请选择】']);
+        $request = \Yii::$app->request;
+        if ($request->isPost) {
+            $model->load($request->post());
+            $introModel->load($request->post());
+            if ($model->validate()) {
+                $model->save();
+                $introModel->save();
+                \Yii::$app->session->setFlash('success', '修改成功');
                 return $this->redirect(['goods/index']);
+            } else {
+                var_dump($model->getErrors());
             }
         }
-        $brands = Brand::find()->all();
-        $brand =ArrayHelper::map($brands,'id',"name");
-//        isset($content->content) ? $content->content : null;
-//        isset($good->logo) ? $good->logo : null;
-        return $this->render("edit",['good'=>$good,'brands'=>$brand,'content'=>$content]);
-
+        $img = $model->logo;
+        return $this->render('add', ['model' => $model, 'introModel' => $introModel, 'brands' => $brands,'img'=>$img]);
     }
+
     public function actionDelete($id){
         //修改状态值到回收站
         Goods::updateAll(['status'=>2,],['id'=>$id]);

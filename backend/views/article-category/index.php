@@ -1,5 +1,10 @@
-<h1>文章列表</h1>
+<h1>文章分类列表</h1>
 <hr>
+<style>
+    tr.td {
+        text-align: center;
+    }
+</style>
 <table class="table">
     <tr>
         <th>ID</th>
@@ -27,7 +32,7 @@
                 }
                 ?></td>
 
-            <td><?=\yii\bootstrap\Html::a('修改',['brand/edit','id'=>$category->id],['class'=>'btn btn-primary'])?>
+            <td><?=\yii\bootstrap\Html::a('修改',['article-category/edit','id'=>$category->id],['class'=>'btn btn-primary'])?>
                 <?=\yii\bootstrap\Html::a('删除',[''],['class'=>'btn btn-danger'])?>
             </td>
 
