@@ -1,17 +1,22 @@
 <?php
 namespace frontend\controllers;
 
+use backend\models\GoodsCategory;
+use frontend\models\Member;
+use frontend\models\MemberForm;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
+
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\web\Request;
 
 /**
  * Site controller
@@ -21,6 +26,7 @@ class SiteController extends Controller
     /**
      * @inheritdoc
      */
+    public $enableCsrfValidation=false;
     public function behaviors()
     {
         return [
@@ -60,7 +66,8 @@ class SiteController extends Controller
             ],
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+                'minLength'=>2,
+                'maxLength'=>3,
             ],
         ];
     }
@@ -72,7 +79,14 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $query=GoodsCategory::find();
+        //家用电器
+        $one=$query->where(['depth'=>0])->all();
+        //冰箱
+        $two=$query->where(['depth'=>1])->all();
+        //多门冰箱
+        $three=$query->where(['depth'=>2])->all();
+        return $this->renderPartial('index',['one'=>$one,'two'=>$two,'three'=>$three]);
     }
 
     /**
@@ -86,13 +100,16 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+        $model = new \frontend\models\LoginForm();
+        if ($model->load(Yii::$app->request->post(),'')) {
+            //调用model的check()方法
+            if ($model->check()){
+                //跳转
+                Yii::$app->session->setFlash('success','登录成功');
+                return $this->redirect(Url::to(['site/index']));
+            }
         } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+            return $this->renderPartial('login');
         }
     }
 
@@ -103,9 +120,9 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
+        \Yii::$app->user->logout();
+        \Yii::$app->session->setFlash('success','注销成功');
+        return $this->redirect(['site/login']);
     }
 
     /**
@@ -148,18 +165,19 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post())) {
-            if ($user = $model->signup()) {
-                if (Yii::$app->getUser()->login($user)) {
-                    return $this->goHome();
-                }
+        $model=new MemberForm();
+        $request=Yii::$app->request;
+        if ($request->isPost){
+            $model->load($request->post(),'');
+            $user = $model->signup();
+            if ($user) {
+                //跳转
+                Yii::$app->session->setFlash('success','注册成功');
+                return $this->redirect(Url::to(['site/index']));
             }
+        }else{
+            return $this->renderPartial('signup');
         }
-
-        return $this->render('signup', [
-            'model' => $model,
-        ]);
     }
 
     /**
@@ -209,5 +227,14 @@ class SiteController extends Controller
         return $this->render('resetPassword', [
             'model' => $model,
         ]);
+    }
+
+    public function actionValidateUser($username){
+        $res = Member::findAll(['username'=>$username]);
+        if ($res){
+            return 'false';
+        }else{
+            return 'true';
+        }
     }
 }

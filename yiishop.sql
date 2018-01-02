@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50714
 File Encoding         : 65001
 
-Date: 2018-01-02 20:56:07
+Date: 2018-01-03 01:48:09
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -267,13 +267,12 @@ CREATE TABLE `brand` (
   `sort` int(11) NOT NULL COMMENT '排序',
   `status` int(2) NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of brand
 -- ----------------------------
-INSERT INTO `brand` VALUES ('7', '123', '123', '/upload/5a3b6adc38c4e.jpg', '123', '1');
-INSERT INTO `brand` VALUES ('6', 'rrr', 'rrr', '/upload/5a3b4ddb79432.jpg', '123', '1');
+INSERT INTO `brand` VALUES ('8', '小米', '为发烧而生', 'http://p1aylb874.bkt.clouddn.com//upload/5a4b9300681f2.jpg', '1', '1');
 
 -- ----------------------------
 -- Table structure for goods
@@ -300,9 +299,9 @@ CREATE TABLE `goods` (
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
-INSERT INTO `goods` VALUES ('1', '123', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a4b5be51ea34.jpg', '1', '7', '123.00', '1123.00', '123', '0', '0', '123', '1514629066', '0');
-INSERT INTO `goods` VALUES ('2', '123', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47680fbc471.jpg', '1', '7', '123.00', '1123.00', '123', '0', '0', '123', '1514629139', '0');
-INSERT INTO `goods` VALUES ('3', '123', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a476a8477bf6.jpg', '1', '6', '123.00', '312.00', '123', '0', '0', '312', '1514629766', '0');
+INSERT INTO `goods` VALUES ('1', '小米5', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a4b93312e1da.jpg', '27', '8', '1999.00', '1999.00', '111', '1', '0', '123', '1514629066', '0');
+INSERT INTO `goods` VALUES ('2', '小米6', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47680fbc471.jpg', '27', '8', '123.00', '1123.00', '123', '0', '0', '123', '1514629139', '0');
+INSERT INTO `goods` VALUES ('3', '小米 mix2', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a476a8477bf6.jpg', '27', '8', '123.00', '312.00', '123', '1', '0', '312', '1514629766', '0');
 INSERT INTO `goods` VALUES ('4', '111', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47954d18a8a.jpg', '1', '6', '11.00', '11.00', '1', '1', '2', '1', '1514640730', '0');
 
 -- ----------------------------
@@ -319,12 +318,50 @@ CREATE TABLE `goods_category` (
   `parent_id` int(11) NOT NULL COMMENT '上级分类id',
   `intro` text COMMENT '简介',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of goods_category
 -- ----------------------------
-INSERT INTO `goods_category` VALUES ('1', '1', '1', '2', '0', '123', '0', '123');
+INSERT INTO `goods_category` VALUES ('1', '1', '1', '36', '0', '手机/运营商/数码', '0', '1');
+INSERT INTO `goods_category` VALUES ('2', '2', '1', '12', '0', '家用电器', '0', '1');
+INSERT INTO `goods_category` VALUES ('3', '3', '1', '8', '0', '电脑/办公', '0', '1');
+INSERT INTO `goods_category` VALUES ('4', '4', '1', '8', '0', '家具/家居/家装/厨具', '0', '1');
+INSERT INTO `goods_category` VALUES ('5', '5', '1', '8', '0', '男装/女装/童装/内页', '0', '1');
+INSERT INTO `goods_category` VALUES ('6', '6', '1', '6', '0', '美妆个护/宠物', '0', '1');
+INSERT INTO `goods_category` VALUES ('7', '2', '2', '3', '1', '电视', '2', '2');
+INSERT INTO `goods_category` VALUES ('8', '2', '4', '5', '1', '空调', '2', '2');
+INSERT INTO `goods_category` VALUES ('9', '2', '6', '7', '1', '洗衣机', '2', '2');
+INSERT INTO `goods_category` VALUES ('10', '2', '8', '9', '1', '冰箱', '2', '2');
+INSERT INTO `goods_category` VALUES ('11', '2', '10', '11', '1', '厨卫大电', '2', '2');
+INSERT INTO `goods_category` VALUES ('12', '1', '2', '11', '1', '手机通讯', '1', '2');
+INSERT INTO `goods_category` VALUES ('13', '1', '12', '19', '1', '运营商', '1', '2');
+INSERT INTO `goods_category` VALUES ('14', '1', '20', '27', '1', '手机配件', '1', '2');
+INSERT INTO `goods_category` VALUES ('15', '1', '28', '35', '1', '摄影摄像', '1', '2');
+INSERT INTO `goods_category` VALUES ('16', '4', '2', '3', '1', '厨具', '4', '2');
+INSERT INTO `goods_category` VALUES ('17', '4', '4', '5', '1', '家纺', '4', '2');
+INSERT INTO `goods_category` VALUES ('18', '4', '6', '7', '1', '生活日用', '4', '2');
+INSERT INTO `goods_category` VALUES ('19', '3', '2', '3', '1', '电脑整机', '3', '2');
+INSERT INTO `goods_category` VALUES ('20', '3', '4', '5', '1', '电脑外设', '3', '2');
+INSERT INTO `goods_category` VALUES ('21', '3', '6', '7', '1', '电脑配件', '3', '2');
+INSERT INTO `goods_category` VALUES ('22', '5', '2', '3', '1', '女装', '5', '2');
+INSERT INTO `goods_category` VALUES ('23', '5', '4', '5', '1', '男装', '5', '2');
+INSERT INTO `goods_category` VALUES ('24', '5', '6', '7', '1', '睡衣', '5', '2');
+INSERT INTO `goods_category` VALUES ('25', '6', '2', '3', '1', '面部护肤', '6', '2');
+INSERT INTO `goods_category` VALUES ('26', '6', '4', '5', '1', '洗发护发', '6', '2');
+INSERT INTO `goods_category` VALUES ('27', '1', '3', '4', '2', '手机', '12', '3');
+INSERT INTO `goods_category` VALUES ('28', '1', '5', '6', '2', '对讲机', '12', '');
+INSERT INTO `goods_category` VALUES ('29', '1', '7', '8', '2', '以旧换新', '12', '');
+INSERT INTO `goods_category` VALUES ('30', '1', '9', '10', '2', '手机维修', '12', '');
+INSERT INTO `goods_category` VALUES ('31', '1', '13', '14', '2', '合约机', '13', '');
+INSERT INTO `goods_category` VALUES ('32', '1', '15', '16', '2', '选号码', '13', '');
+INSERT INTO `goods_category` VALUES ('33', '1', '17', '18', '2', '固话宽带', '13', '');
+INSERT INTO `goods_category` VALUES ('34', '1', '21', '22', '2', '手机壳', '14', '');
+INSERT INTO `goods_category` VALUES ('35', '1', '23', '24', '2', '贴膜', '14', '');
+INSERT INTO `goods_category` VALUES ('36', '1', '25', '26', '2', '手机存储卡', '14', '');
+INSERT INTO `goods_category` VALUES ('37', '1', '29', '30', '2', '数码相机', '15', '');
+INSERT INTO `goods_category` VALUES ('38', '1', '31', '32', '2', '拍立得', '15', '');
+INSERT INTO `goods_category` VALUES ('39', '1', '33', '34', '2', '单反相机', '15', '');
 
 -- ----------------------------
 -- Table structure for goods_day_count
@@ -378,6 +415,30 @@ INSERT INTO `goods_intro` VALUES ('1', '<p>123</p>');
 INSERT INTO `goods_intro` VALUES ('2', '<p>123</p>');
 INSERT INTO `goods_intro` VALUES ('3', '<p>3123</p>');
 INSERT INTO `goods_intro` VALUES ('4', '<p>111</p>');
+
+-- ----------------------------
+-- Table structure for member
+-- ----------------------------
+DROP TABLE IF EXISTS `member`;
+CREATE TABLE `member` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL COMMENT '用户名',
+  `auth_key` varchar(100) NOT NULL,
+  `password_hash` varchar(100) NOT NULL COMMENT '密码（密文）',
+  `email` varchar(100) NOT NULL COMMENT '邮箱',
+  `tel` char(11) NOT NULL COMMENT '电话',
+  `last_login_time` int(11) DEFAULT NULL COMMENT '最后登录时间',
+  `last_login_ip` int(11) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of member
+-- ----------------------------
+INSERT INTO `member` VALUES ('1', '111111', 'MLSCH867n604EVaaLpey0sizqr98QCKZ', '$2y$13$H3G/giOTCZBn./uT3XmYWuSP.pDYaFQ6F5/azrjTWPTdN7UfM/Hw6', '11@qq.com', '11111111111', null, null, '1', '1514914130', null);
 
 -- ----------------------------
 -- Table structure for menu
