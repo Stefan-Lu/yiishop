@@ -10,10 +10,33 @@ Target Server Type    : MYSQL
 Target Server Version : 50714
 File Encoding         : 65001
 
-Date: 2018-01-03 01:48:09
+Date: 2018-01-03 21:16:26
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for address
+-- ----------------------------
+DROP TABLE IF EXISTS `address`;
+CREATE TABLE `address` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `member_id` int(11) NOT NULL,
+  `province` varchar(50) NOT NULL,
+  `city` varchar(50) NOT NULL,
+  `area` varchar(50) NOT NULL,
+  `detail_addr` varchar(200) NOT NULL,
+  `person_name` varchar(20) NOT NULL,
+  `tel` char(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of address
+-- ----------------------------
+INSERT INTO `address` VALUES ('1', '1', 'dsf 北京 市辖区 东城区 df fdsf', '', '', '', '', '');
+INSERT INTO `address` VALUES ('2', '1', 'stefan 四川 成都市 武侯区 高新区天府新谷 13088888888', '', '', '', '', '');
+INSERT INTO `address` VALUES ('3', '1', '四川', '成都市', '锦江区', '天府新歌1111', 'lu', '10033330000');
 
 -- ----------------------------
 -- Table structure for article
@@ -536,4 +559,4 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('8', '111', '5a48bcc5189f1', '$2y$13$MIjMEvwX.srkpFxWedY6pegWURP1cZrk6RYcd6H2zFOLN9.9HzY.u', null, '111', '1', '1514716357', null, '1514879545', '127.0.0.1', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a48bcc022df1.jpg');
+INSERT INTO `user` VALUES ('8', '111', '5a48bcc5189f1', '$2y$13$MIjMEvwX.srkpFxWedY6pegWURP1cZrk6RYcd6H2zFOLN9.9HzY.u', null, '111', '1', '1514716357', null, '1514943242', '127.0.0.1', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a48bcc022df1.jpg');
