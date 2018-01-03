@@ -5,6 +5,7 @@ namespace backend\models;
 use Yii;
 use creocoder\nestedsets\NestedSetsBehavior;
 use yii\helpers\Json;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "goods_category".
@@ -100,6 +101,40 @@ class GoodsCategory extends \yii\db\ActiveRecord
         $rows=self::find()->select('*')->asArray()->all();
         array_unshift($rows,['name'=>'顶级分类','id'=>0,'parent_id'=>0]);
         return Json::encode($rows);
+    }
+
+    public static function getCategories()
+    {
+        //redis
+        $redis=new \Redis();
+        $redis->open('127.0.0.1','6379');
+        $html=$redis->get('category_html');
+        if (!$html){
+            //==================================
+            $firstCategory = \backend\models\GoodsCategory::find()->where(['parent_id' => 0])->all();
+            foreach ($firstCategory as $k1 => $first) {
+                $html .= '<div class="cat ' . ($k1 ? '' : 'item1') . '">';
+                $html .= '<h3><a href="'.Url::to(['goods/goods-category','id'=>$first->id]).'">' . $first->name . '</a><b></b></h3>';
+                $html .= '<div class="cat_detail">';
+                $secondCategory = \backend\models\GoodsCategory::find()->where(['parent_id' => $first->id])->all();
+                foreach ($secondCategory as $k2 => $second) {
+                    $html .= '<dl ' . ($k2 ? '' : 'dl_1st') . '>';
+                    $html .= '<dt><a href="'.Url::to(['goods/goods-category','id'=>$second->id]).'">' . $second->name . '</a></dt>';
+                    $html .= '<dd>';
+                    $thridCategory = \backend\models\GoodsCategory::find()->where(['parent_id' => $second->id])->all();
+                    foreach ($thridCategory as $thrid) {
+                        $html .= '<a href="'.Url::to(['goods/goods-category','id'=>$thrid->id]).'">' . $thrid->name . '</a>';
+                    }
+                    $html .= '</dd>';
+                    $html .= '</dl>';
+                }
+                $html .= '</div>';
+                $html .= '</div>';
+            }
+            //==================================
+            $redis->set('category_html',$html,24*3600);
+        }
+        return $html;
     }
 
 }
