@@ -14,7 +14,9 @@ class LoginForm extends Model{
             ];
         }
         public function check(){
-            $member=Member::findOne(['username'=>$this->username]);
+            //var_dump($this->username);die;
+            $member = Member::findOne(['username'=>$this->username]);
+            //var_dump($member);die;
             //先判断名字,在验证密码
             if ($member){
                 //名字存在

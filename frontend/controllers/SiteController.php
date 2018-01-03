@@ -107,6 +107,8 @@ class SiteController extends Controller
                 //跳转
                 Yii::$app->session->setFlash('success','登录成功');
                 return $this->redirect(Url::to(['site/index']));
+            }else{
+                echo '登录失败';die;
             }
         } else {
             return $this->renderPartial('login');
