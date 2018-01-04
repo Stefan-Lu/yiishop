@@ -17,6 +17,7 @@ use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use yii\web\Request;
+use frontend\models\SignatureHelper;
 
 /**
  * Site controller
@@ -239,4 +240,98 @@ class SiteController extends Controller
             return 'true';
         }
     }
+
+    public function actionValidateTel($tel){
+        $res = Member::findAll(['tel'=>$tel]);
+        if ($res){
+            return 'false';
+        }else{
+            return 'true';
+        }
+    }
+    //测试阿里大于短信功能
+    public function actionSms($phone){
+        //正则表达式  电话号码验证
+        //return '电话号码不正确';
+
+        $code = rand(1000,9999);
+        $result = Yii::$app->sms->send($phone,['code'=>$code]);
+        if($result->Code == 'OK'){
+            //短信发送成功
+
+            //将短信验证码保存到redis
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1');
+            $redis->set('code_'.$phone,$code,30*60);
+            //验证
+            //表单提交的手机号码$tel和验证码$code
+            /*$c = $redis->get('code_'.$tel);
+            if($c==false){
+                //验证码过期,验证失败
+            }else{
+                if($c == $code){
+                    //验证成功
+                }else{
+                    //验证失败
+                }
+            }*/
+
+            return 'true';
+        }else{
+            //发送失败
+            return '短信发送失败';
+        }
+        /*$params = array ();
+
+        // *** 需用户填写部分 ***
+
+        // fixme 必填: 请参阅 https://ak-console.aliyun.com/ 取得您的AK信息
+        $accessKeyId = "LTAIAAN96x2hlV1H";
+        $accessKeySecret = "DkFPsWeaGOAIPwAR9Aem1aP9Imxagy";
+
+        // fixme 必填: 短信接收号码
+        $params["PhoneNumbers"] = "18108008028";
+
+        // fixme 必填: 短信签名，应严格按"签名名称"填写，请参考: https://dysms.console.aliyun.com/dysms.htm#/develop/sign
+        $params["SignName"] = "李某茶馆";
+
+        // fixme 必填: 短信模板Code，应严格按"模板CODE"填写, 请参考: https://dysms.console.aliyun.com/dysms.htm#/develop/template
+        $params["TemplateCode"] = "SMS_120115260";
+
+        // fixme 可选: 设置模板参数, 假如模板中存在变量需要替换则为必填项
+        $params['TemplateParam'] = Array (
+            "code" => rand(1000,9999),
+            //"product" => "阿里通信"
+        );
+
+        // fixme 可选: 设置发送短信流水号
+        //$params['OutId'] = "12345";
+
+        // fixme 可选: 上行短信扩展码, 扩展码字段控制在7位或以下，无特殊需求用户请忽略此字段
+        //$params['SmsUpExtendCode'] = "1234567";
+
+
+        // *** 需用户填写部分结束, 以下代码若无必要无需更改 ***
+        if(!empty($params["TemplateParam"]) && is_array($params["TemplateParam"])) {
+            $params["TemplateParam"] = json_encode($params["TemplateParam"], JSON_UNESCAPED_UNICODE);
+        }
+
+        // 初始化SignatureHelper实例用于设置参数，签名以及发送请求
+        $helper = new SignatureHelper();
+
+        // 此处可能会抛出异常，注意catch
+        $content = $helper->request(
+            $accessKeyId,
+            $accessKeySecret,
+            "dysmsapi.aliyuncs.com",
+            array_merge($params, array(
+                "RegionId" => "cn-hangzhou",
+                "Action" => "SendSms",
+                "Version" => "2017-05-25",
+            ))
+        );
+
+        var_dump($content);*/
+    }
+
 }

@@ -33,6 +33,13 @@ class MemberController extends Controller
         $model = new Address();
         //var_dump($request->post());die;
         $model->load($request->post(),'');
+        if ($request->post('default') == 1){
+            $addrs = Address::find()->where(['default'=>1])->andWhere(['member_id'=>\Yii::$app->user->identity->getId()])->all();
+            foreach ($addrs as $addr){
+                $addr->default = 0;
+                $addr->save();
+            }
+        }
         $model->member_id = \Yii::$app->user->identity->id;
         $res = $model->save();
         $id = \Yii::$app->db->getLastInsertID();
@@ -42,4 +49,68 @@ class MemberController extends Controller
             echo Json::encode(['status'=>0]);
         }
     }
+
+    public function actionDelAddr(){
+        $request = new Request();
+        $id = $request->get('id');
+        $model = Address::findOne(['id'=>$id]);
+        $res = $model->delete();
+        if($res){
+            echo Json::encode(['status'=>1]);
+        }
+    }
+
+    public function actionDefaultAddr(){
+        $request = new Request();
+        $id = $request->get('id');
+        $addrs = Address::find()->where(['default'=>1])->andWhere(['member_id'=>\Yii::$app->user->identity->getId()])->all();
+        foreach ($addrs as $addr){
+            $addr->default = 0;
+            $addr->save();
+        }
+
+        $model = Address::findOne(['id'=>$id]);
+        $model->default = 1;
+        $res = $model->save();
+        if($res){
+            echo Json::encode(['status'=>1]);
+        }
+    }
+
+    public function actionGetAddr(){
+        $request = new Request();
+        $id = $request->get('id');
+        $model = Address::findOne(['id'=>$id]);
+        echo Json::encode([
+            'person_name'=>$model->person_name,
+            'tel'=>$model->tel,
+            'detail_address'=>$model->detail_addr,
+            'default_address'=>$model->default,
+            'cmbProvince'=>$model->province,
+            'cmbCity'=>$model->city,
+            'cmbArea'=>$model->area,
+        ]);
+
+    }
+
+    public function actionEditAddr(){
+        $request = new Request();
+        $id = $request->post('id');
+        //var_dump($id);die;
+        if($request->post('default') == 1){
+            $addrs = Address::find()->where(['default'=>1])->andWhere(['member_id'=>\Yii::$app->user->identity->getId()])->all();
+            foreach ($addrs as $addr){
+                $addr->default = 0;
+                $addr->save();
+            }
+        }
+
+        $model = Address::findOne(['id'=>$id]);
+        $model->load($request->post(),'');
+        $res = $model->save();
+        if($res){
+            echo Json::encode(['status'=>1]);
+        }
+    }
+
 }

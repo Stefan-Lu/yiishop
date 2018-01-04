@@ -36,6 +36,13 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'sms'=>[
+            'class'=>\frontend\components\Sms::className(),
+            'ak'=>'LTAIjEgQeskYdTNp',
+            'sk'=>'6q614DCMpVqn6Su0qDFPsxqB2QOOkQ',
+            'sign'=>'微微的卤包蛋',
+            'template'=>'SMS_120120267'
+        ]
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,

@@ -79,12 +79,12 @@
 							<input type="text" class="txt" value="" placeholder="请输入短信验证码" name="" disabled="disabled" id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px"/>
 							
 						</li>
-						<li class="checkcode">
-							<label for="">验证码：</label>
-							<input type="text"  name="captcha" />
-							<img src="/images/checkcode1.jpg" alt="" />
-							<span>看不清？<a href="">换一张</a></span>
-						</li>
+                        <li class="checkcode">
+                            <label for="">图像验证码：</label>
+                            <input type="text"  name="checkcode" />
+                            <img id="img_captcha" />
+                            <span>看不清？<a id="change_captcha" href="javascript:;">换一张</a></span>
+                        </li>
 						
 						<li>
 							<label for="">&nbsp;</label>
@@ -138,7 +138,22 @@
 	</div>
 	<!-- 底部版权 end -->
 	<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
 	<script type="text/javascript">
+        //点击切换验证码
+        $("#change_captcha").click(function(){
+            $.getJSON("<?=\yii\helpers\Url::to(['site/captcha','refresh'=>1])?>",function (json) {
+                //改变验证码图片的地址
+                $("#img_captcha").attr('src',json.url);
+                //保存hash值
+                hash = json.hash1;//102 105 120=327
+                //console.log(hash);
+            });
+        });
+        $("#change_captcha").click();
+
 		function bindPhoneNum(){
 			//启用输入框
 			$('#captcha').prop('disabled',false);
@@ -157,22 +172,51 @@
 				
 				$('#get_captcha').val(html);
 			},1000);
-		}		
-	</script>
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
-    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
-    <script type="text/javascript" >
+
+            //发送短信
+            var phone = $("#tel").val();//获取电话号码
+            $.get("<?=\yii\helpers\Url::to(['site/sms'])?>",{phone:phone},function (data) {
+                if(data == 'true'){
+                    //短信发送成功
+                    console.log('短信发送成功');
+                }else{
+                    //发送失败
+                    alert(data);
+                }
+            });
+
+		}
+        var hash;
+        //添加自定义验证规则
+        jQuery.validator.addMethod("captcha", function(value, element) {
+            //console.log(value);
+            //console.log(element);
+            //var tel = /^[0-9]{6}$/;
+            var v=value.toLowerCase();
+            var h;
+            for (var i = v.length - 1, h = 0; i >= 0; --i) {
+                h += v.charCodeAt(i);
+            }
+            return  h == hash;
+            //return false;//验证不通过 返回false
+        }, "请正确填写验证码");
+
+        // 手机号码验证
+        jQuery.validator.addMethod("isMobile", function(value, element) {
+            var length = value.length;
+            var mobile = /^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/;
+            return this.optional(element) || (length == 11 && mobile.test(value));
+        }, "请正确填写您的手机号码");
+
         $().ready(function() {
 // 在键盘按下并释放及提交后验证提交表单
             $("#signupForm").validate({
                 rules: {
                     username: {
                         required: true,
-                        minlength: 2,
+                        minlength: 5,
                         remote: {
                             url: "<?=\yii\helpers\Url::to(['site/validate-user'])?>",     //后台处理程序
-
                         }
                     },
                     password: {
@@ -189,19 +233,22 @@
                         email: true
                     },
                     tel: {
-                        required: true,
-                        minlength: 11
+                        required : true,
+                        remote: {
+                            url: "<?=\yii\helpers\Url::to(['site/validate-tel'])?>",     //后台处理程序
+                        },
+                        isMobile : true
                     },
-                    captcha: {
-                        required: true,
+                    checkcode: {
+                        captcha:true,
                     },
-                    agree: "required"
+
                 },
                 messages: {
                     username: {
                         required: "请输入用户名",
-                        minlength: "用户名最小长度为2",
-                        remote:'用户名已存在'
+                        minlength: "用户名最小长度为5",
+                        remote:'用户名已存在',
                     },
                     password: {
                         required: "请输入密码",
@@ -211,6 +258,11 @@
                         required: "请输入密码",
                         minlength: "密码长度不能小于 5 个字母",
                         equalTo: "两次密码输入不一致"
+                    },
+                    phone : {
+                        required : "请输入手机号",
+                        isMobile : "请正确填写您的手机号码",
+                        remote : '该手机号码已存在',
                     },
                     email: "请输入一个正确的邮箱",
                     agree: "请接受我们的声明",

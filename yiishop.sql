@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50714
 File Encoding         : 65001
 
-Date: 2018-01-03 21:16:26
+Date: 2018-01-04 17:36:02
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -28,15 +28,19 @@ CREATE TABLE `address` (
   `detail_addr` varchar(200) NOT NULL,
   `person_name` varchar(20) NOT NULL,
   `tel` char(11) NOT NULL,
+  `default` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of address
 -- ----------------------------
-INSERT INTO `address` VALUES ('1', '1', 'dsf 北京 市辖区 东城区 df fdsf', '', '', '', '', '');
-INSERT INTO `address` VALUES ('2', '1', 'stefan 四川 成都市 武侯区 高新区天府新谷 13088888888', '', '', '', '', '');
-INSERT INTO `address` VALUES ('3', '1', '四川', '成都市', '锦江区', '天府新歌1111', 'lu', '10033330000');
+INSERT INTO `address` VALUES ('14', '1', '北京', '市辖区', '东城区', 'wer', 'ewr', 'ewr', '0');
+INSERT INTO `address` VALUES ('22', '1', '天津', '市辖区', '河东区', '12333', '112233', '123333', '0');
+INSERT INTO `address` VALUES ('24', '1', '北京', '市辖区', '东城区', 'sdf', 'sdf', 'dsfsda', '1');
+INSERT INTO `address` VALUES ('18', '1', '天津', '县', '宁河县', '123', '123333', '1111', '0');
+INSERT INTO `address` VALUES ('19', '1', '北京', '市辖区', '东城区', 'sdf', 'aaaafff', 'aaa', '0');
+INSERT INTO `address` VALUES ('23', '1', '北京', '市辖区', '东城区', 'sf', 'ss', 'df', '0');
 
 -- ----------------------------
 -- Table structure for article
@@ -461,7 +465,7 @@ CREATE TABLE `member` (
 -- ----------------------------
 -- Records of member
 -- ----------------------------
-INSERT INTO `member` VALUES ('1', '111111', 'MLSCH867n604EVaaLpey0sizqr98QCKZ', '$2y$13$H3G/giOTCZBn./uT3XmYWuSP.pDYaFQ6F5/azrjTWPTdN7UfM/Hw6', '11@qq.com', '11111111111', null, null, '1', '1514914130', null);
+INSERT INTO `member` VALUES ('1', '111111', 'MLSCH867n604EVaaLpey0sizqr98QCKZ', '$2y$13$H3G/giOTCZBn./uT3XmYWuSP.pDYaFQ6F5/azrjTWPTdN7UfM/Hw6', '11@qq.com', '18048484803', null, null, '1', '1514914130', null);
 
 -- ----------------------------
 -- Table structure for menu

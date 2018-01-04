@@ -466,12 +466,12 @@
 			<div class="address_hd" id="div1">
 				<h3>收货地址薄</h3>
                 <?php foreach ($address as $add):?>
-				<dl id="<?=$add['id']?>">
-					<dt><?=$add['person_name']?>&nbsp;<?=$add['province']?>&nbsp;<?=$add['city']?>&nbsp;<?=$add['area']?>&nbsp;<?=$add['detail_addr']?>&nbsp;<?=$add['tel']?></dt>
+				<dl class="addr" id="<?=$add['id']?>">
+					<dt><?=$add['person_name']?>&nbsp;<?=$add['province']?>&nbsp;<?=$add['city']?>&nbsp;<?=$add['area']?>&nbsp;<?=$add['detail_addr']?>&nbsp;<?=$add['tel']?> <?=$add['default'] == 1? '&nbsp;&nbsp;<span style="color: red"><b>默认地址</b></span>':''?></dt>
 					<dd>
-						<a id="edit<?=$add['id']?>" href="#">修改</a>
-						<a id="del<?=$add['id']?>" href="#">删除</a>
-						<a id="default<?=$add['id']?>" href="#">设为默认地址</a>
+						<a class="edit" href="javascript:void(0);">修改</a>
+						<a class="del" href="javascript:void(0);">删除</a>
+						<a class="default" href="javascript:void(0);">设为默认地址</a>
 					</dd>
 				</dl>
                 <?php endforeach;?>
@@ -503,7 +503,7 @@
 							</li>
 							<li>
 								<label for="">&nbsp;</label>
-								<input type="checkbox" name="default_address" class="check" />设为默认地址
+								<input type="checkbox" id="default_address" name="default_address" value="1" class="check" />设为默认地址
 							</li>
 							<li>
 								<label for="">&nbsp;</label>
@@ -619,27 +619,123 @@
                 var cmbCity = $('#cmbCity').val();
                 var cmbArea = $('#cmbArea').val();
                 var detail_address = $('#detail_address').val();
+                var default_address = $('#default_address').is(':checked')? $('#default_address').val() : 0;
                 var tel = $('#tel').val();
 
                 var address = person_name+' '+cmbProvince+' '+cmbCity+' '+cmbArea+' '+detail_address+' '+tel;
 
-                $.post('<?=\yii\helpers\Url::to(['member/new-add'])?>',{'person_name':person_name,'tel':tel,'province':cmbProvince,'city':cmbCity,'area':cmbArea,'detail_addr':detail_address},function (row) {
+                $.post('<?=\yii\helpers\Url::to(['member/new-add'])?>',{'person_name':person_name,'tel':tel,'province':cmbProvince,'city':cmbCity,'area':cmbArea,'detail_addr':detail_address,'default':default_address},function (row) {
                     if(row.status){
                         var html = '';
                         html += '<dl id='+row.status+'>';
-                        html += '<dt>'+address+'</dt>';
+                        default_address == 1 ? html += '<dt>'+address+'&nbsp;&nbsp;<span style="color: red"><b>默认地址</b></span></dt>': html += '<dt>'+address+'</dt>';
                         html += '<dd>';
-                        html += '<a id="edit'+row.status+'" href="#">修改</a>&nbsp;';
-                        html += '<a id="del'+row.status+'" href="#">删除</a>&nbsp;';
-                        html += '<a id="default'+row.status+'" href="#">设为默认地址</a>&nbsp;';
+                        html += '<a class="edit" href="javascript:void(0);">修改</a>&nbsp;';
+                        html += '<a class="del" href="javascript:void(0);">删除</a>&nbsp;';
+                        html += '<a class="default" href="javascript:void(0);">设为默认地址</a>&nbsp;';
                         html += ' </dd>';
                         html += ' </dl>';
-                        $(html).appendTo('#div1');
-                    }
-                },'json')
 
+                        //移除所有的默认地址标记？
+                        if(default_address == 1){
+                            $('.addr').find('span').remove();
+                        }
+
+                        $(html).appendTo('#div1');
+
+                        $(':input','#address_form')
+                            .not(':button, :submit, :reset, :hidden')
+                            .val('')
+                            .removeAttr('checked')
+                            .removeAttr('selected');
+
+                    }
+                },'json');
                 return false;
             })
+            $('.del').click(function () {
+                var id = $(this).closest('dl').attr('id');
+                confirm('确定要删除这条地址吗？');
+                $.getJSON('<?=\yii\helpers\Url::to(['member/del-addr'])?>',{'id':id},function (res) {
+                    if(res.status == 1){
+                        $('#'+id).fadeOut();
+                    }
+                })
+            })
+
+            $('.default').click(function () {
+                var id = $(this).closest('dl').attr('id');
+                confirm('要将这条地址设为默认地址吗？');
+
+                $.getJSON('<?=\yii\helpers\Url::to(['member/default-addr'])?>',{'id':id},function (res) {
+                    if(res.status == 1){
+                        $('.addr').find('span').remove();
+                        $('#'+id).find('dt').append('&nbsp;&nbsp;<span style="color: red"><b>默认地址</b></span>');
+                    }
+                })
+            })
+
+            $('.edit').click(function () {
+                var id = $(this).closest('dl').attr('id');
+                $.getJSON('<?=\yii\helpers\Url::to(['member/get-addr'])?>',{'id':id},function (res) {
+
+
+                    $('#person_name').val(res.person_name);
+                    if(res.default_address ==1){
+                        $('#default_address').prop('checked','true');
+                    }
+
+                    $('#tel').val(res.tel);
+                    $('#detail_address').val(res.detail_address);
+
+                    addressInit('cmbProvince', 'cmbCity', 'cmbArea', res.cmbProvince,res.cmbCity,res.cmbArea);
+                    $('#address_form').unbind();
+                    $('#address_form').submit(function () {
+                        var person_name = $('#person_name').val();
+                        var cmbProvince = $('#cmbProvince').val();
+                        var cmbCity = $('#cmbCity').val();
+                        var cmbArea = $('#cmbArea').val();
+                        var detail_address = $('#detail_address').val();
+                        var default_address = $('#default_address').is(':checked')? $('#default_address').val() : 0;
+                        var tel = $('#tel').val();
+
+                        var address = person_name+' '+cmbProvince+' '+cmbCity+' '+cmbArea+' '+detail_address+' '+tel;
+
+                        var data = {
+                            'id':id,
+                            'person_name':person_name,
+                            'cmbProvince':cmbProvince,
+                            'cmbCity':cmbCity,
+                            'cmbArea':cmbArea,
+                            'detail_address':detail_address,
+                            'default':default_address,
+                            'tel':tel
+                        }
+                        $.post('<?=\yii\helpers\Url::to(['member/edit-addr'])?>',data,function (res) {
+                            if(res.status == 1){
+                                if(default_address == 1){
+                                    $('.addr').find('span').remove();
+                                    $('#'+id).find('dt').html(address+'&nbsp;&nbsp;<span style="color: red"><b>默认地址</b></span>');
+                                    alert('修改成功');
+                                }else {
+                                    $('#'+id).find('dt').html(address);
+                                    alert('修改成功');
+                                }
+                                $(':input','#address_form')
+                                    .not(':button, :submit, :reset, :hidden')
+                                    .val('')
+                                    .removeAttr('checked')
+                                    .removeAttr('selected');
+                               //window.reload();
+                                //$('#address_form').unbind();
+                            }
+                        },'json')
+
+                        return false;
+                    })
+                })
+            })
+
         </script>
 
 </body>

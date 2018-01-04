@@ -8,6 +8,7 @@ class MemberForm extends Model{
     public $password;
     public $email;
     public $tel;
+
     public function rules()
     {
         return [
@@ -15,6 +16,8 @@ class MemberForm extends Model{
             [['username'], 'string', 'max' => 50],
             [['password', 'email'], 'string', 'max' => 100],
             [['tel'], 'string', 'max' => 11],
+            ['tel','unique']
+            ['captcha',]
         ];
     }
 
@@ -27,11 +30,11 @@ class MemberForm extends Model{
         if (!$this->validate()) {
             return null;
         }
-        $member=new Member();
+        $member = new Member();
         $member->username=$this->username;
-        $member->password_hash=\Yii::$app->security->generatePasswordHash($this->password);
-        $member->email=$this->email;
-        $member->tel=$this->tel;
+        $member->password_hash =\Yii::$app->security->generatePasswordHash($this->password);
+        $member->email = $this->email;
+        $member->tel = $this->tel;
         if ($member->save(false)){
             \Yii::$app->user->login($member,3600);
             return true;
