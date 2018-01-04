@@ -24,7 +24,7 @@ class GoodsController extends Controller{
             $ids=ArrayHelper::map($ids,'id','id');
         }
         $goods=Goods::find()->where(['in','goods_category_id',$ids])->all();
-        return $this->render('list',['goods'=>$goods]);
+        return $this->renderPartial('list',['goods'=>$goods]);
     }
 
     /**
@@ -37,7 +37,7 @@ class GoodsController extends Controller{
         $goodsIntro=GoodsIntro::findOne(['goods_id'=>$id]);
         $goodsGallery=GoodsGallery::findAll(['goods_id'=>$id]);
         $first=array_shift($goodsGallery);
-        return $this->render('goods',['goods'=>$goods,'goodsIntro'=>$goodsIntro,'goodsGallery'=>$goodsGallery,'first'=>$first]);
+        return $this->renderPartial('goods',['goods'=>$goods,'goodsIntro'=>$goodsIntro,'goodsGallery'=>$goodsGallery,'first'=>$first]);
     }
 
 
@@ -48,6 +48,6 @@ class GoodsController extends Controller{
         $request=\Yii::$app->request;
         //var_dump($request->get('keywords'));
         $goods=Goods::find()->where(['LIKE','name',$request->get('keywords')])->all();
-        return $this->render('list',['goods'=>$goods]);
+        return $this->renderPartial('list',['goods'=>$goods]);
     }
 }

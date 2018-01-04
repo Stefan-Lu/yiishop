@@ -5,7 +5,7 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
+use frontend\models\LoginForm;
 
 /**
  * Site controller
@@ -68,20 +68,29 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
+    public function actionLogin(){
+        if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+        if ($model->load(\Yii::$app->request->post(),'')) {
+            if ($model->validate()){
+                //调用model的check()方法
+                $result = $model->check();
+                if ($result=='true'){
+                    //跳转
+                    return $this->redirect(Url::to(['site/index']));
+                }else if ($result=='1'){
+                    $model->addError('username','用户名不存在');
+                }else{
+                    $model->addError('password','密码不正确');
+                }
+            }else{
+                var_dump($model->getErrors());
+            }
         }
+        return $this->render('login');
     }
 
     /**

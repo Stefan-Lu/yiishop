@@ -76,7 +76,7 @@
 						</li>
 						<li>
 							<label for="">验证码：</label>
-							<input type="text" class="txt" value="" placeholder="请输入短信验证码" name="" disabled="disabled" id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px"/>
+							<input type="text" class="txt" value="" placeholder="请输入短信验证码" name="sms_code" disabled="disabled" id="captcha"/> <input type="button" onclick="bindPhoneNum(this)" id="get_captcha" disabled value="获取验证码" style="height: 25px;padding:3px 8px"/>
 							
 						</li>
                         <li class="checkcode">
@@ -155,10 +155,15 @@
         $("#change_captcha").click();
 
 		function bindPhoneNum(){
-			//启用输入框
+            var phone = $("#tel").val();//获取电话号码
+            if (!phone.match(/^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/)) {
+                alert("请输入正确的手机号码~");
+                return false;
+            }
+                //启用输入框
 			$('#captcha').prop('disabled',false);
 
-			var time=30;
+			var time = 30;
 			var interval = setInterval(function(){
 				time--;
 				if(time<=0){
@@ -175,6 +180,7 @@
 
             //发送短信
             var phone = $("#tel").val();//获取电话号码
+
             $.get("<?=\yii\helpers\Url::to(['site/sms'])?>",{phone:phone},function (data) {
                 if(data == 'true'){
                     //短信发送成功
@@ -205,12 +211,20 @@
         jQuery.validator.addMethod("isMobile", function(value, element) {
             var length = value.length;
             var mobile = /^(13[0-9]{9})|(18[0-9]{9})|(14[0-9]{9})|(17[0-9]{9})|(15[0-9]{9})$/;
-            return this.optional(element) || (length == 11 && mobile.test(value));
+
+            var res =  this.optional(element) || (length == 11 && mobile.test(value));
+            if(res){
+                $('#get_captcha').attr('disabled',false);
+            }else {
+                $('#get_captcha').attr('disabled',true);
+            }
+            return res;
         }, "请正确填写您的手机号码");
 
         $().ready(function() {
 // 在键盘按下并释放及提交后验证提交表单
             $("#signupForm").validate({
+
                 rules: {
                     username: {
                         required: true,
@@ -219,8 +233,6 @@
                             url: "<?=\yii\helpers\Url::to(['site/validate-user'])?>",     //后台处理程序
                         }
                     },
-
-                    
                     password: {
                         required: true,
                         minlength: 5
@@ -244,6 +256,23 @@
                     checkcode: {
                         captcha:true,
                     },
+                    sms_code:{
+                        required : true,
+                        remote: {
+                            url: "<?=\yii\helpers\Url::to(['site/validate-sms'])?>",     //后台处理程序
+                            type: "post",               //数据发送方式
+                            dataType: "json",           //接受数据格式
+                            data:{
+                                tel:function () {
+                                    return $('#tel').val();
+                                },
+                                code:function () {
+                                    return $('#captcha').val();
+                                }
+                            }
+                        },
+                    },
+                    agree:{required: true},
 
                 },
                 messages: {
@@ -256,7 +285,7 @@
                         required: "请输入密码",
                         minlength: "密码长度不能小于 5 个字母"
                     },
-                    confirm_password: {
+                    re_password: {
                         required: "请输入密码",
                         minlength: "密码长度不能小于 5 个字母",
                         equalTo: "两次密码输入不一致"
@@ -268,9 +297,13 @@
                     },
                     email: "请输入一个正确的邮箱",
                     agree: "请接受我们的声明",
-
+                    sms_code:{
+                        required : "请输入短信验证码",
+                        remote : '验证码错误',
+                    }
                 },
                 errorElement:'span',
+
             })
         });
 

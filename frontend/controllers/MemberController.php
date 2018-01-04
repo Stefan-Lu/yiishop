@@ -17,6 +17,12 @@ use yii\web\Request;
 class MemberController extends Controller
 {
     public $enableCsrfValidation = false;
+    public function actionLogout()
+    {
+        \Yii::$app->user->logout();
+        return $this->redirect(['site/index']);
+    }
+
     public function actionAddr(){
         if(\Yii::$app->user->isGuest){
             \Yii::$app->session->setFlash('error','请先登录后操作');

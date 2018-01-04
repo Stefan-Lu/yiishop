@@ -1,53 +1,45 @@
 <?php
+namespace frontend\models;
 
-namespace backend\models;
-
-
+use frontend\models\Member;
 use yii\base\Model;
 
-class LoginForm extends Model
-{
-    public $username;
-    public $password;
-    public  $rememberMe;
-    public $code;//验证码
-    public function attributeLabels()
-    {
-        return [
-          'username'=>'用户名',
-            'password'=>'密码',
-            'rememberMe'=>'记住我',
-            'code'=>'验证码'
-        ];
-    }
-    public function rules()
-    {
-       return [
-         [['username','password'],'required'],//不能为空
-           [['rememberMe'],'integer'],
-           ['code','captcha','captchaAction'=>'user/captcha'],
-       ];
-    }
-    public function login(){
-        //用来验证登录信息
-        $user = User::findOne(['username'=>$this->username]);
-        if($user){
-            //用户信息存在
-            if(\Yii::$app->security->validatePassword($this->password,$user->password_hash)){
-                $auto_login_time = '';
-                if($this->rememberMe){
-                    $auto_login_time = 3600*24*7;
+class LoginForm extends Model{
+        public $username;
+        public $password;
+        public $rememberMe;
+        public $checkcode;
+
+        public function rules()
+        {
+            return [
+                [['username','password'],'required'],
+                ['rememberMe','safe'],
+                ['checkcode','captcha','captchaAction' => 'site/captcha'],
+            ];
+        }
+        public function check(){
+            $member=Member::findOne(['username'=>$this->username]);
+            //先判断名字,在验证密码
+            if ($member){
+                //名字存在
+                //验证密码
+                if (\Yii::$app->security->validatePassword($this->password,$member->password_hash)){
+                    $time='';
+                    if ($this->rememberMe){
+                        $time=3600;
+                    }
+                    \Yii::$app->user->login($member,$time);
+                    $member->last_login_ip=\Yii::$app->getRequest()->getUserIP();
+                    $member->last_login_time=time();
+                    $member->save();
+                    return 'true';
+                }else{
+                    return '2';
                 }
-                \Yii::$app->user->login($user,$auto_login_time);//存入用户的信息
-                return true;
             }
             else{
-                $this->addError("password",'密码不正确');
+                return '1';
             }
         }
-        else{
-            $this->addError('username','用户名不存在');
-        }
-    }
-
 }

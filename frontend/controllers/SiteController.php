@@ -121,12 +121,7 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionLogout()
-    {
-        \Yii::$app->user->logout();
-        \Yii::$app->session->setFlash('success','注销成功');
-        return $this->redirect(['site/login']);
-    }
+
 
     /**
      * Displays contact page.
@@ -168,15 +163,16 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-        $model=new MemberForm();
-        $request=Yii::$app->request;
+        $model = new MemberForm();
+        $request = Yii::$app->request;
         if ($request->isPost){
             $model->load($request->post(),'');
-            $user = $model->signup();
-            if ($user) {
-                //跳转
+            if ($user = $model->signup()) {
                 Yii::$app->session->setFlash('success','注册成功');
-                return $this->redirect(Url::to(['site/index']));
+                if(Yii::$app->getUser()->login($user)){
+                    return $this->redirect(Url::to(['site/index']));
+                }
+
             }
         }else{
             return $this->renderPartial('signup');
@@ -239,6 +235,17 @@ class SiteController extends Controller
         }else{
             return 'true';
         }
+    }
+
+    public function actionValidateSms(){
+        $request = new Request();
+        $data = $request->post();
+        //var_dump($data);die;
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1');
+        $redis_code = $redis->get('code_'.$data['tel']);
+        //echo $redis_code;die;
+        echo $data['code'] == $redis_code?'true':'false';
     }
 
     public function actionValidateTel($tel){
