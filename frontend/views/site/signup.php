@@ -219,6 +219,8 @@
                             url: "<?=\yii\helpers\Url::to(['site/validate-user'])?>",     //后台处理程序
                         }
                     },
+
+                    
                     password: {
                         required: true,
                         minlength: 5
