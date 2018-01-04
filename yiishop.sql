@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50714
 File Encoding         : 65001
 
-Date: 2018-01-04 17:36:02
+Date: 2018-01-04 22:48:38
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -460,12 +460,13 @@ CREATE TABLE `member` (
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of member
 -- ----------------------------
-INSERT INTO `member` VALUES ('1', '111111', 'MLSCH867n604EVaaLpey0sizqr98QCKZ', '$2y$13$H3G/giOTCZBn./uT3XmYWuSP.pDYaFQ6F5/azrjTWPTdN7UfM/Hw6', '11@qq.com', '18048484803', null, null, '1', '1514914130', null);
+INSERT INTO `member` VALUES ('1', '111111', 'MLSCH867n604EVaaLpey0sizqr98QCKZ', '$2y$13$H3G/giOTCZBn./uT3XmYWuSP.pDYaFQ6F5/azrjTWPTdN7UfM/Hw6', '11@qq.com', '1111111111', null, null, '1', '1514914130', null);
+INSERT INTO `member` VALUES ('2', 'lu3991851', 'H0BmbFd-uyfcKT0w-LE5z1-EPcASdmud', '$2y$13$fOcTBv7fIufc68FZCfpcuO/l2c3MNXg78vuStZaNvJFcAFBLGpfWi', '496777782@qq.com', '18048484803', null, null, '1', '1515069437', null);
 
 -- ----------------------------
 -- Table structure for menu
