@@ -1,8 +1,4 @@
-/*
-@功能：购物车页面js
-@作者：diamondwang
-@时间：2013年11月14日
-*/
+
 
 $(function(){
 	
@@ -24,6 +20,8 @@ $(function(){
 		});
 
 		$("#total").text(total.toFixed(2));
+		var goods_id = $(this).closest('tr').attr('id');
+		changeNum(goods_id,$(amount).val());
 	});
 
 	//增加
@@ -40,6 +38,9 @@ $(function(){
 		});
 
 		$("#total").text(total.toFixed(2));
+
+        var goods_id = $(this).closest('tr').attr('id');
+		changeNum(goods_id,$(amount).val());
 	});
 
 	//直接输入
@@ -59,5 +60,14 @@ $(function(){
 
 		$("#total").text(total.toFixed(2));
 
+        var goods_id = $(this).closest('tr').attr('id');
+        changeNum(goods_id,$(this).val());
 	});
 });
+var changeNum = function (goods_id,amount) {
+	result = 'false';
+	$.post("/goods/cart-change",{goods_id:goods_id,amount:amount},function (res) {
+		 result = res.del;
+    },'json');
+	return result;
+}

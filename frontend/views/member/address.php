@@ -726,7 +726,7 @@
                                     .val('')
                                     .removeAttr('checked')
                                     .removeAttr('selected');
-                               //window.reload();
+                               window.location.reload();
                                 //$('#address_form').unbind();
                             }
                         },'json')

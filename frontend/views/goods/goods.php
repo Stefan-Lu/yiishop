@@ -215,22 +215,9 @@ echo $this->render('@webroot/public/head');
                     <li class="market_price"><span>定价：</span><em>￥<?php echo $goods->shop_price?></em></li>
                     <li class="shop_price"><span>本店价：</span> <strong>￥<?php echo $goods->shop_price?></strong> <a href="">(降价通知)</a></li>
                     <li><span>上架时间：</span><?php echo date('Y-m-d',$goods->create_time)?></li>
-                    <li class="star"><span>商品评分：</span> <strong></strong><a href="">(已有<?php
-                            //redis存查看量
-                            $redis=new Redis();
-                            $redis->open('127.0.0.1','6379');
-                            $num=$redis->get('view_times_'.$goods->id);
-                            if ($num){
-                                echo $redis->get('view_times_'.$goods->id);
-                                $redis->set("view_times_$goods->id",$num+1);
-                                //设置一个定时任务同步到数据库
-                            }else{
-                                $redis->set("view_times_$goods->id",$goods->view_times);
-                                echo 1;
-                            }
-                             ?>人评价)</a></li> <!-- 此处的星级切换css即可 默认为5星 star4 表示4星 star3 表示3星 star2表示2星 star1表示1星 -->
+                    <li class="star"><span>商品评分：</span> <strong></strong><a href="">(已有<?=$goods->view_times?>人评价)</a></li> <!-- 此处的星级切换css即可 默认为5星 star4 表示4星 star3 表示3星 star2表示2星 star1表示1星 -->
                 </ul>
-                <form action="" method="post" class="choose">
+                <form action="<?=\yii\helpers\Url::to(['goods/add-to-cart'])?>" method="get" class="choose">
                     <ul>
 
                         <li>
@@ -248,6 +235,8 @@ echo $this->render('@webroot/public/head');
                             <dl>
                                 <dt>&nbsp;</dt>
                                 <dd>
+                                    <input type="hidden" name="r" value="site/add-to-cart"/>
+                                    <input type="hidden" name="goods_id" value="<?=$goods->id?>"/>
                                     <input type="submit" value="" class="add_btn" />
                                 </dd>
                             </dl>
