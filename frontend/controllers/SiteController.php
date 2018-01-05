@@ -2,6 +2,7 @@
 namespace frontend\controllers;
 
 use backend\models\GoodsCategory;
+use frontend\models\Cart;
 use frontend\models\Member;
 use frontend\models\MemberForm;
 use Yii;
@@ -105,8 +106,37 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post(),'')) {
             //调用model的check()方法
             if ($model->check()){
+                //将cookie的购物车添加到数据库中
+                $cookies = \Yii::$app->request->cookies;
+                $value = $cookies->getValue('cart');
+                $cart_cookie = unserialize($value);
+                //var_dump($cart_cookie);die;
+                $cart_db = [];
+                $model = Cart::find()->where(['member_id'=>Yii::$app->user->getId()])->asArray()->all();
+                foreach ($model as $cart){
+                    $cart_db[$cart['goods_id']] = $cart['amount'];
+                }
+                $cart_dif = array_diff_assoc($cart_cookie,$cart_db);
+                //var_dump($cart_dif);die;
+                $res = 'no';
+                foreach ($cart_dif as $key=>$value){
+                    if(!array_key_exists($key,$cart_db)){
+                        $res = 'yes';
+                        break;
+                    }
+                }
+                //var_dump($res);die;
+                if($res == 'yes'){
+                    foreach ($cart_dif as $k=>$v){
+                       $model = new Cart();
+                       $model->goods_id = $k;
+                       $model->amount = $v;
+                       $model->member_id = Yii::$app->user->getId();
+                       $model->save(false);
+                   }
+                }
+
                 //跳转
-                Yii::$app->session->setFlash('success','登录成功');
                 return $this->redirect(Url::to(['site/index']));
             }else{
                 echo '登录失败';die;

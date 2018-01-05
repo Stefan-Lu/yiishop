@@ -122,23 +122,19 @@
 </div>
 <!-- 底部版权 end -->
 <script type="text/javascript" charset="UTF-8">
-    var total = 0;
-    $('.col5 span').each(function () {
-         total += parseInt($(this).text());
 
-    })
-    $('#total').text(total);
 
 
     //删除购物车
     $('.col6 a').click(function () {
         var id = $(this).closest('tr').attr('id');
-        console.log(id);
-        var res = changeNum(id,0);
-        console.log(res);
-       // if( res == 'true'){
+        if(confirm('确定要将此商品从购物车移除吗？')){
+            changeNum(id,0);
             $(this).closest('tr').fadeOut();
-      //  }
+
+            var new_total = parseInt($('#total').text()) - parseInt($('#'+id+' .col5 span').text());
+            $('#total').text(new_total);
+        }
 
     })
 

@@ -1,7 +1,11 @@
 
 
 $(function(){
-	
+    var total = 0;
+    $('.col5 span').each(function () {
+         total += parseInt($(this).text());
+    })
+    $('#total').text(total);
 	//减少
 	$(".reduce_num").click(function(){
 		var amount = $(this).parent().find(".amount");
@@ -65,9 +69,5 @@ $(function(){
 	});
 });
 var changeNum = function (goods_id,amount) {
-	result = 'false';
-	$.post("/goods/cart-change",{goods_id:goods_id,amount:amount},function (res) {
-		 result = res.del;
-    },'json');
-	return result;
+	$.post("/goods/cart-change",{goods_id:goods_id,amount:amount});
 }

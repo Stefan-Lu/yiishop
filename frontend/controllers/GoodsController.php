@@ -91,13 +91,30 @@ class GoodsController extends Controller{
             $cookies->add($cookie);
 
         }else{
-            //已登录,则购物车数据保存到数据表\
+            //从数据库中找到对应记录？ 不存在添加，存在修改
             $user_id = \Yii::$app->user->getId();
-            $model = new Cart();
-            $model->goods_id = $goods_id;
-            $model->amount = $amount;
-            $model->member_id  = $user_id;
-            $model->save();
+            $model = Cart::find()->where(['member_id'=>$user_id])->asArray()->all();
+            $cart = [];
+            foreach ($model as $goods){
+                $cart[$goods['goods_id']] = $goods['amount'];
+            }
+            if(array_key_exists($goods_id,$cart)){
+                $model = Cart::findOne(['goods_id'=>$goods_id]);
+                $model->goods_id = $goods_id;
+                $model->amount = $model->amount+ 1;
+                $model->member_id  = $user_id;
+                $model->save();
+            }else{
+                $model = new Cart();
+                $model->goods_id = $goods_id;
+                $model->amount = $amount;
+                $model->member_id  = $user_id;
+                $model->save();
+            }
+
+            //已登录,则购物车数据保存到数据表\
+
+
 
         }
 
