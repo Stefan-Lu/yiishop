@@ -109,7 +109,14 @@ class GoodsController extends Controller{
                 $model->goods_id = $goods_id;
                 $model->amount = $amount;
                 $model->member_id  = $user_id;
-                $model->save();
+               // $model->save(false);
+
+               if($model->validate()){
+                    $model->save();
+                }else{
+                    var_dump($model->getErrors());die;
+                }
+
             }
 
             //已登录,则购物车数据保存到数据表\
@@ -127,9 +134,13 @@ class GoodsController extends Controller{
         if(\Yii::$app->user->isGuest){
             //读cookie
             $cookies = \Yii::$app->request->cookies;
-            $value = $cookies->getValue('cart');
-            $cart = unserialize($value);
-            //$cart = [1=>2,2=>3]
+            if($cookies->has('cart')){
+                $value = $cookies->getValue('cart');
+                $cart = unserialize($value);
+            }else{
+                $cart = [];
+            }
+
             $ids = array_keys($cart);
 
         }else{
@@ -144,8 +155,6 @@ class GoodsController extends Controller{
             foreach ($model as $value){
                 $cart[$value['goods_id']] = $value['amount'];
             }
-
-
         }
 
         $models = Goods::find()->where(['in','id',$ids])->all();

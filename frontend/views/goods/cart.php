@@ -130,10 +130,9 @@
         var id = $(this).closest('tr').attr('id');
         if(confirm('确定要将此商品从购物车移除吗？')){
             changeNum(id,0);
-            $(this).closest('tr').fadeOut();
-
             var new_total = parseInt($('#total').text()) - parseInt($('#'+id+' .col5 span').text());
             $('#total').text(new_total);
+            $(this).closest('tr').remove();
         }
 
     })

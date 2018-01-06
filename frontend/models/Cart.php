@@ -28,8 +28,7 @@ class Cart extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'required'],
-            [['id', 'goods_id', 'amount', 'member_id'], 'integer'],
+            [[ 'goods_id', 'amount', 'member_id'], 'integer'],
         ];
     }
 

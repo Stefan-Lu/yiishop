@@ -106,35 +106,38 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post(),'')) {
             //调用model的check()方法
             if ($model->check()){
+
                 //将cookie的购物车添加到数据库中
+                //获取cookie中的数据
                 $cookies = \Yii::$app->request->cookies;
                 $value = $cookies->getValue('cart');
                 $cart_cookie = unserialize($value);
-                //var_dump($cart_cookie);die;
+               //获取db中的数据
                 $cart_db = [];
                 $model = Cart::find()->where(['member_id'=>Yii::$app->user->getId()])->asArray()->all();
                 foreach ($model as $cart){
                     $cart_db[$cart['goods_id']] = $cart['amount'];
                 }
-                $cart_dif = array_diff_assoc($cart_cookie,$cart_db);
-                //var_dump($cart_dif);die;
-                $res = 'no';
-                foreach ($cart_dif as $key=>$value){
-                    if(!array_key_exists($key,$cart_db)){
-                        $res = 'yes';
-                        break;
+                //判断差异数据是否存在于数据库
+                foreach ($cart_cookie as $k=>$v){
+                    //goods_id不存在，添加这条数据
+                    if(!array_key_exists($k,$cart_db)){
+                        $model = new Cart();
+                        $model->goods_id = $k;
+                        $model->amount = $v;
+                        $model->member_id = Yii::$app->user->getId();
+                        $model->save(false);
+                
+                    }else{
+                        //goods_id存在，将cookie中amount添加到db
+                        $model = Cart::findOne(['member_id'=>Yii::$app->user->getId(),'goods_id'=>$k]);
+                        $model->amount += $v;
+                        $model->save(false);
                     }
                 }
-                //var_dump($res);die;
-                if($res == 'yes'){
-                    foreach ($cart_dif as $k=>$v){
-                       $model = new Cart();
-                       $model->goods_id = $k;
-                       $model->amount = $v;
-                       $model->member_id = Yii::$app->user->getId();
-                       $model->save(false);
-                   }
-                }
+                //删除本地购物车
+                $cookies = Yii::$app->response->cookies;
+                $cookies->remove('cart');
 
                 //跳转
                 return $this->redirect(Url::to(['site/index']));
