@@ -127,7 +127,7 @@ class SiteController extends Controller
                         $model->amount = $v;
                         $model->member_id = Yii::$app->user->getId();
                         $model->save(false);
-                
+
                     }else{
                         //goods_id存在，将cookie中amount添加到db
                         $model = Cart::findOne(['member_id'=>Yii::$app->user->getId(),'goods_id'=>$k]);

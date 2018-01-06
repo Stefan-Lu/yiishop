@@ -5,7 +5,9 @@ use backend\models\GoodsCategory;
 use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
 use backend\models\Goods;
+use frontend\models\Address;
 use frontend\models\Cart;
+use frontend\models\Order;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -226,6 +228,91 @@ class GoodsController extends Controller{
             }
 
         }
+
+
+    public function actionOrder(){
+        //必须是登录状态,如果未登录,则引导用户登录
+
+        $request = \Yii::$app->request;
+        if($request->isPost){
+            $order = new Order();
+            $order->load($request->post(),'');
+
+            $address = Address::findOne(['id'=>$order->address_id]);
+            $order->name = $address->name;
+            //.....
+//            name	varchar(50)	收货人
+//province	varchar(20)	省
+//city	varchar(20)	市
+//area	varchar(20)	县
+//address	varchar(255)	详细地址
+//tel	char(11)	电话号码
+
+            //送货方式
+            $order->delivery_name = Order::$deliveries[$order->delivery_id][0];
+            $order->delivery_price = Order::$deliveries[$order->delivery_id][1];
+
+            //支付方式
+
+
+            $order->total = 0;
+            $order->status = 1;
+            $order->member_id = \Yii::$app->user->id;
+
+            //开始操作数据库之前 开启事务
+            $transaction = \Yii::$app->db->beginTransaction();
+            try{
+                if($order->validate()){
+                    //保存订单数据
+                    $order->save();
+
+                }
+                //遍历购物车商品信息,依次保存订单商品信息
+                $carts = Cart::find()->where()->all();
+                foreach ($carts as $cart){
+                    $goods = Goods::findOne(['id'=>$cart->goods_id]);
+                    //判断商品库存
+                    if($goods->stock >= $cart->amount){
+                        //库存足够
+                        $orderGoods = new OrderGoods();
+                        $orderGoods->order_id = $order->id;
+                        //...
+                        $orderGoods->total = $orderGoods->price*$orderGoods->amount;
+                        $orderGoods->save();
+
+                        //扣减库存
+                        $goods->stock -= $cart->amount;
+                        $goods->save(false);
+
+
+                        $order->total += $orderGoods->total;
+                    }else{
+                        //库存不够 抛出异常
+                        throw new Exception('商品库存不足,请修改购物车');
+                    }
+                }
+
+                //处理运费
+                $order->total += $order->delivery_price;
+
+                $order->save();
+                //清除购物车数据
+
+                //提交事务
+                $transaction->commit();
+            }catch (Exception $e){
+                //回滚
+                $transaction->rollBack();
+            }
+
+        }
+
+        //显示订单表单
+        //获取当前用户收货地址用于回显
+        //获取送货方式
+
+        return $this->renderPartial('order');
+    }
 
 
 }
