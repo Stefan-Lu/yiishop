@@ -241,19 +241,17 @@ class GoodsController extends Controller{
             $address = Address::findOne(['id'=>$order->address_id]);
             $order->name = $address->name;
             //.....
-//            name	varchar(50)	收货人
-//province	varchar(20)	省
-//city	varchar(20)	市
-//area	varchar(20)	县
-//address	varchar(255)	详细地址
-//tel	char(11)	电话号码
-
+            //name	varchar(50)	收货人
+            //province	varchar(20)	省
+            //city	varchar(20)	市
+            //area	varchar(20)	县
+            //address	varchar(255)	详细地址
+            //tel	char(11)	电话号码
             //送货方式
             $order->delivery_name = Order::$deliveries[$order->delivery_id][0];
             $order->delivery_price = Order::$deliveries[$order->delivery_id][1];
 
             //支付方式
-
 
             $order->total = 0;
             $order->status = 1;
