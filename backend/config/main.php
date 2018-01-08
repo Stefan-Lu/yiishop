@@ -12,7 +12,7 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'modules' => [],
-    'language'=>'Zh-CN',
+    'language'=>'zh-CN',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
@@ -21,6 +21,7 @@ return [
             'identityClass' => 'backend\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
+            'loginUrl'=>['user/login']
         ],
         'session' => [
             // this is the name of the session cookie used for login on the backend

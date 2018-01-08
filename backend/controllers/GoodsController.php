@@ -22,6 +22,7 @@ use Qiniu\Auth;
 use Qiniu\Storage\UploadManager;
 use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
 use yii\web\UploadedFile;
@@ -29,14 +30,15 @@ use yii\web\UploadedFile;
 class GoodsController extends Controller
 {
     public $enableCsrfValidation = false;
-    /*public function behaviors()
+    public function behaviors()
     {
         return [
             'rbac'=>[
                 'class'=>RbacFilter::className(),
-            ]
+                'except' => ['logout','upload','captcha','ueditor'],
+            ],
         ];
-    }*/
+    }
     public function actions()
     {
         return [
@@ -44,8 +46,8 @@ class GoodsController extends Controller
                 'class' => 'kucha\ueditor\UEditorAction',
                 'config'=>[
                     //上传图片配置
-                    'imageUrlPrefix' => "", /* 图片访问路径前缀 */
-                    'imagePathFormat' => "/goods/".date("Y-m-d"), /* 上传保存路径,可以自定义保存路径和文件名格式 */
+                    'imageUrlPrefix' => "http://www.admin.shop.com", /* 图片访问路径前缀 */
+                    'imagePathFormat' => "/goods/".date("Y-m-d",time()), /* 上传保存路径,可以自定义保存路径和文件名格式 */
                 ]
             ]
         ];
@@ -143,9 +145,13 @@ class GoodsController extends Controller
         return $this->render('add', ['model' => $model, 'introModel' => $introModel, 'brands' => $brands,'img'=>$img]);
     }
 
-    public function actionDelete($id){
-        //修改状态值到回收站
-        Goods::updateAll(['status'=>2,],['id'=>$id]);
+    public function actionDelete($id)
+    {
+        $row = Goods::findOne(['id' => $id]);
+        $res = $row->delete();
+        if($res){
+            echo Json::encode(['status'=>1]);
+        }
 
     }
     public function actionShow($id){
@@ -158,22 +164,7 @@ class GoodsController extends Controller
         $rows = GoodsGallery::findAll(['goods_id' => $id]);
         return $this->render('gallery', ['rows' => $rows, 'goods_id' => $id]);
     }
-    public function actionCeshi(){//处理图片
-        //插入到数据库中
-        if($_POST){
-            $id = $_POST['id'];
-            $path = $_POST['path'];
-            //存放到数据库中
-            $sql = "insert into goods_gallery set goods_id = '{$id}', `path` = '{$path}'";
-            $query = \Yii::$app->db;
-            $query->createCommand($sql)->execute();
-            return true;
-        }
-        else{
-            return false;
-        }
 
-    }
     public function actionDel($id){
         //用于删除相册
         GoodsGallery::deleteAll(['id'=>$id]);
