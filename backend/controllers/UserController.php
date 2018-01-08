@@ -165,7 +165,7 @@ class UserController extends Controller
                 User::updateAll(['last_login_time'=>$last_time,'last_login_ip'=>$ip],['username'=>$name]);
                 \Yii::$app->session->setFlash("success", "登陆成功");
                 //跳转
-                return $this->redirect(['user/index']);
+                return $this->redirect(['site/index']);
             }
         }
         return $this->render('login',['user'=>$user]);

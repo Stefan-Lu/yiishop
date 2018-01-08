@@ -110,8 +110,13 @@ class SiteController extends Controller
                 //将cookie的购物车添加到数据库中
                 //获取cookie中的数据
                 $cookies = \Yii::$app->request->cookies;
+                if($cookies->has('cart')){
                 $value = $cookies->getValue('cart');
-                $cart_cookie = unserialize($value);
+                    $cart_cookie = unserialize($value);
+                 }else{
+                    $cart_cookie = [];
+                }
+
                //获取db中的数据
                 $cart_db = [];
                 $model = Cart::find()->where(['member_id'=>Yii::$app->user->getId()])->asArray()->all();
