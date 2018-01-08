@@ -8,6 +8,7 @@ use backend\models\Goods;
 use frontend\models\Address;
 use frontend\models\Cart;
 use frontend\models\Order;
+use frontend\models\OrderGoods;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -230,86 +231,120 @@ class GoodsController extends Controller{
         }
 
 
+    //提交订单页
     public function actionOrder(){
-        //必须是登录状态,如果未登录,则引导用户登录
+        if(\Yii::$app->user->isGuest){
+            return $this->redirect(['site/login']);
+        }
+        $model=new Order();
 
-        $request = \Yii::$app->request;
-        if($request->isPost){
-            $order = new Order();
-            $order->load($request->post(),'');
+        $address=Address::findAll(['member_id'=>\Yii::$app->user->identity->id]);
 
-            $address = Address::findOne(['id'=>$order->address_id]);
-            $order->name = $address->name;
-            //.....
-            //name	varchar(50)	收货人
-            //province	varchar(20)	省
-            //city	varchar(20)	市
-            //area	varchar(20)	县
-            //address	varchar(255)	详细地址
-            //tel	char(11)	电话号码
-            //送货方式
-            $order->delivery_name = Order::$deliveries[$order->delivery_id][0];
-            $order->delivery_price = Order::$deliveries[$order->delivery_id][1];
+        $carts=Cart::findAll(['member_id'=>\Yii::$app->user->identity->id]);
+        $ids=ArrayHelper::map($carts,'goods_id','goods_id');
+        $amount=ArrayHelper::map($carts,'goods_id','amount');
 
+        $goods=Goods::find()->where(['in','id',$ids])->all();
+        $goods_name=ArrayHelper::map($goods,'id','name');
+        $goods_logo=ArrayHelper::map($goods,'id','logo');
+        $goods_price=ArrayHelper::map($goods,'id','shop_price');
+
+        $request=\Yii::$app->request;
+        if ($request->isPost){
+            $model->load($request->post(),'');
+            //var_dump($model);die;
+
+            $post_data=$request->post();
+            //var_dump($request->post());die;
+            //收货地址
+            $address=Address::findOne(['id'=>$post_data['address_id']]);
+            //var_dump($address);die;
+            $model->member_id=\Yii::$app->user->identity->id;
+            $model->name=$address->person_name;
+            $model->province=$address->province;
+            $model->city=$address->city;
+            $model->area=$address->area;
+            $model->address=$address->detail_addr;
+            $model->tel=$address->tel;
+            //配送方式
+            $model->delivery_name=Order::$delivery[$model->delivery_id][0];
+            $model->delivery_price=Order::$delivery[$model->delivery_id][1];
             //支付方式
+            $model->payment_id=1;
+            $model->payment_name="支付宝";
+            //订单状态
+            $model->status=1;
+            $model->trade_no='pay001';
+            $model->total=0;
+            $model->create_time=time();
 
-            $order->total = 0;
-            $order->status = 1;
-            $order->member_id = \Yii::$app->user->id;
-
-            //开始操作数据库之前 开启事务
-            $transaction = \Yii::$app->db->beginTransaction();
+            //开启事务
+            $transaction=\Yii::$app->db->beginTransaction();
             try{
-                if($order->validate()){
-                    //保存订单数据
-                    $order->save();
-
+                //var_dump($model);die;
+                if ($model->validate()){
+                    $model->save();
                 }
-                //遍历购物车商品信息,依次保存订单商品信息
-                $carts = Cart::find()->where()->all();
+                else{
+                    var_dump($model->getErrors());
+                }
+                //总金额
+                $sum=0;
+                //order_goods表
                 foreach ($carts as $cart){
-                    $goods = Goods::findOne(['id'=>$cart->goods_id]);
-                    //判断商品库存
-                    if($goods->stock >= $cart->amount){
-                        //库存足够
-                        $orderGoods = new OrderGoods();
-                        $orderGoods->order_id = $order->id;
-                        //...
-                        $orderGoods->total = $orderGoods->price*$orderGoods->amount;
-                        $orderGoods->save();
-
-                        //扣减库存
-                        $goods->stock -= $cart->amount;
+                    $goods=Goods::findOne(['id'=>$cart->goods_id]);
+                    if ($goods->stock>=$cart->amount){
+                        $order_goods=new OrderGoods();
+                        $order_goods->order_id=$model->id;
+                        $order_goods->goods_id=$cart->goods_id;
+                        $order_goods->goods_name=$goods_name[$cart->goods_id];
+                        $order_goods->logo=$goods_logo[$cart->goods_id];
+                        $order_goods->price=$goods_price[$cart->goods_id];
+                        $order_goods->amount=$cart->amount;
+                        $order_goods->total=$cart->amount*$goods_price[$cart->goods_id];
+                        $sum+=$order_goods->total;
+                        $order_goods->save();
+                        //
+                        $goods->stock-=$order_goods->amount;
                         $goods->save(false);
 
-
-                        $order->total += $orderGoods->total;
+                        //
                     }else{
-                        //库存不够 抛出异常
-                        throw new Exception('商品库存不足,请修改购物车');
+                        throw new Exception('库存不足');
                     }
                 }
-
-                //处理运费
-                $order->total += $order->delivery_price;
-
-                $order->save();
-                //清除购物车数据
-
+                $model->total=$sum;
+                $model->save();
+                //清空购物车
+                Cart::deleteAll(['member_id'=>\Yii::$app->user->identity->id]);
                 //提交事务
                 $transaction->commit();
-            }catch (Exception $e){
-                //回滚
+                return $this->redirect(['goods/order-goods']);
+            }catch (Exception $exception){
+                //事务回滚
                 $transaction->rollBack();
             }
-
+        }else{
+            //var_dump($address);die;
+            return $this->renderPartial('order',['address'=>$address,'goods'=>$goods,'amount'=>$amount]);
         }
 
-        //显示订单表单
-        //获取当前用户收货地址用于回显
-        //获取送货方式
+    }
 
-        return $this->renderPartial('order');
+    /**
+     * @return string
+     */
+    public function actionOrderGoods(){
+        return $this->renderPartial('order-goods');
+    }
+
+    /**
+     * @return string
+     */
+    public function actionOrderList(){
+        $model=Order::find()->where(['member_id'=>\Yii::$app->user->identity->id])->all();
+        $gallerys=OrderGoods::find()->all();
+        return $this->renderPartial('order-list',['rows'=>$model,'gallerys'=>$gallerys]);
     }
 
 
