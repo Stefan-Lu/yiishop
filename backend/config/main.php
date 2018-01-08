@@ -12,7 +12,7 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'modules' => [],
-    'language'=>'Zh-CN',
+    'language'=>'zh-CN',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
