@@ -65,14 +65,10 @@ $js=<<<JS
         if (confirm('是否确定删除')){
             var id =$(this).attr('id');
         $.getJSON('$html'+id,function(data) {
-            console.debug(data.status);
-            if (data.status!=0){
+           
+            if (data.status == 1){
                 var name='#goods'+id;
                 $(name).fadeOut();
-                alert('删除成功');
-            }
-            else{
-                alert('删除失败');
             }
         })
         }
