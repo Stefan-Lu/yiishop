@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50714
 File Encoding         : 65001
 
-Date: 2018-01-04 22:48:38
+Date: 2018-01-09 13:07:45
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -30,7 +30,7 @@ CREATE TABLE `address` (
   `tel` char(11) NOT NULL,
   `default` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of address
@@ -41,6 +41,7 @@ INSERT INTO `address` VALUES ('24', '1', '北京', '市辖区', '东城区', 'sd
 INSERT INTO `address` VALUES ('18', '1', '天津', '县', '宁河县', '123', '123333', '1111', '0');
 INSERT INTO `address` VALUES ('19', '1', '北京', '市辖区', '东城区', 'sdf', 'aaaafff', 'aaa', '0');
 INSERT INTO `address` VALUES ('23', '1', '北京', '市辖区', '东城区', 'sf', 'ss', 'df', '0');
+INSERT INTO `address` VALUES ('25', '2', '上海', '县', '崇明县', '3123', '11123', '12312312', '1');
 
 -- ----------------------------
 -- Table structure for article
@@ -302,6 +303,22 @@ CREATE TABLE `brand` (
 INSERT INTO `brand` VALUES ('8', '小米', '为发烧而生', 'http://p1aylb874.bkt.clouddn.com//upload/5a4b9300681f2.jpg', '1', '1');
 
 -- ----------------------------
+-- Table structure for cart
+-- ----------------------------
+DROP TABLE IF EXISTS `cart`;
+CREATE TABLE `cart` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `goods_id` int(11) DEFAULT NULL,
+  `amount` int(11) DEFAULT NULL,
+  `member_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of cart
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for goods
 -- ----------------------------
 DROP TABLE IF EXISTS `goods`;
@@ -321,14 +338,14 @@ CREATE TABLE `goods` (
   `create_time` int(11) NOT NULL COMMENT '添加时间',
   `view_times` int(11) NOT NULL COMMENT '浏览次数',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
-INSERT INTO `goods` VALUES ('1', '小米5', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a4b93312e1da.jpg', '27', '8', '1999.00', '1999.00', '111', '1', '0', '123', '1514629066', '0');
-INSERT INTO `goods` VALUES ('2', '小米6', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47680fbc471.jpg', '27', '8', '123.00', '1123.00', '123', '0', '0', '123', '1514629139', '0');
-INSERT INTO `goods` VALUES ('3', '小米 mix2', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a476a8477bf6.jpg', '27', '8', '123.00', '312.00', '123', '1', '0', '312', '1514629766', '0');
+INSERT INTO `goods` VALUES ('1', '小米5', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a4b93312e1da.jpg', '27', '8', '1999.00', '1999.00', '101', '1', '0', '123', '1514629066', '35');
+INSERT INTO `goods` VALUES ('2', '小米6', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47680fbc471.jpg', '27', '8', '123.00', '1123.00', '118', '0', '0', '123', '1514629139', '73');
+INSERT INTO `goods` VALUES ('3', '小米 mix2', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a476a8477bf6.jpg', '27', '8', '123.00', '312.00', '123', '1', '0', '312', '1514629766', '1');
 INSERT INTO `goods` VALUES ('4', '111', '2017123000001', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47954d18a8a.jpg', '1', '6', '11.00', '11.00', '1', '1', '2', '1', '1514640730', '0');
 
 -- ----------------------------
@@ -537,6 +554,59 @@ INSERT INTO `migration` VALUES ('m171222_010026_create_goods_table', '1514622404
 INSERT INTO `migration` VALUES ('m171222_010039_create_goods_intro_table', '1514622404');
 INSERT INTO `migration` VALUES ('m171222_010102_create_goods_gallery_table', '1514622404');
 INSERT INTO `migration` VALUES ('m140506_102106_rbac_init', '1514698482');
+
+-- ----------------------------
+-- Table structure for order
+-- ----------------------------
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `member_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `province` varchar(20) NOT NULL,
+  `city` varchar(20) NOT NULL,
+  `area` varchar(20) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `tel` varchar(11) NOT NULL,
+  `delivery_id` int(11) NOT NULL,
+  `delivery_name` varchar(255) NOT NULL,
+  `delivery_price` decimal(10,2) NOT NULL,
+  `payment_id` int(11) NOT NULL,
+  `payment_name` varchar(255) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `status` int(11) NOT NULL,
+  `trade_no` varchar(255) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order
+-- ----------------------------
+INSERT INTO `order` VALUES ('2', '2', '11123', '上海', '县', '崇明县', '3123', '12312312', '3', '中通快递', '20.00', '1', '支付宝', '25605.00', '1', 'pay001', '1515426669');
+
+-- ----------------------------
+-- Table structure for order_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `order_goods`;
+CREATE TABLE `order_goods` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `goods_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `goods_name` varchar(255) NOT NULL,
+  `logo` varchar(255) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order_goods
+-- ----------------------------
+INSERT INTO `order_goods` VALUES ('1', '1', '2', '小米5', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a4b93312e1da.jpg', '1999.00', '6', '11994.00');
+INSERT INTO `order_goods` VALUES ('2', '1', '2', '小米5', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a4b93312e1da.jpg', '1999.00', '4', '7996.00');
+INSERT INTO `order_goods` VALUES ('3', '2', '2', '小米6', 'http://p1aylb874.bkt.clouddn.com//upload/goods/5a47680fbc471.jpg', '1123.00', '5', '5615.00');
 
 -- ----------------------------
 -- Table structure for user
