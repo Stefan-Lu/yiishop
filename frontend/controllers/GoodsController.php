@@ -39,12 +39,13 @@ class GoodsController extends Controller{
      * @return string
      */
     public function actionGoods($id){
-        $goods=Goods::findOne(['id'=>$id]);
+/*        $goods=Goods::findOne(['id'=>$id]);
         Goods::updateAllCounters(['view_times'=>1],['id'=>$id]);
         $goodsIntro=GoodsIntro::findOne(['goods_id'=>$id]);
         $goodsGallery=GoodsGallery::findAll(['goods_id'=>$id]);
         $first=array_shift($goodsGallery);
-        return $this->renderPartial('goods',['goods'=>$goods,'goodsIntro'=>$goodsIntro,'goodsGallery'=>$goodsGallery,'first'=>$first]);
+        return $this->renderPartial('goods',['goods'=>$goods,'goodsIntro'=>$goodsIntro,'goodsGallery'=>$goodsGallery,'first'=>$first]);*/
+        return $this->redirect('/goods/'.$id.'.html');
     }
 
 
@@ -319,6 +320,14 @@ class GoodsController extends Controller{
                 Cart::deleteAll(['member_id'=>\Yii::$app->user->identity->id]);
                 //提交事务
                 $transaction->commit();
+                //发送下单成功邮件
+                $result = \Yii::$app->mailer->compose()
+                    ->setFrom('lu3991851@163.com')//admin@shop.com
+                    ->setTo('lu3991851@163.com')
+                    ->setSubject('邮件主题：下单成功通知')
+                    ->setHtmlBody('<span style="color: red">您已成功在微微的零食铺下单</span> ')
+                    ->send();
+                //var_dump($result);die;
                 return $this->redirect(['goods/order-goods']);
             }catch (Exception $exception){
                 //事务回滚

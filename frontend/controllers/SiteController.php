@@ -81,14 +81,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $query=GoodsCategory::find();
-        //家用电器
-        $one=$query->where(['depth'=>0])->all();
-        //冰箱
-        $two=$query->where(['depth'=>1])->all();
-        //多门冰箱
-        $three=$query->where(['depth'=>2])->all();
-        return $this->renderPartial('index',['one'=>$one,'two'=>$two,'three'=>$three]);
+        $contents = $this->renderPartial('index');
+        file_put_contents('index.html',$contents);
+        return $this->renderPartial('@frontend/web/index.html');
     }
 
     /**

@@ -18,6 +18,7 @@ use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
 use backend\models\GoodsSearchForm;
 use backend\models\GoodsSerch;
+use Codeception\Module\Db;
 use Qiniu\Auth;
 use Qiniu\Storage\UploadManager;
 use yii\data\Pagination;
@@ -30,15 +31,15 @@ use yii\web\UploadedFile;
 class GoodsController extends Controller
 {
     public $enableCsrfValidation = false;
-    public function behaviors()
+/*    public function behaviors()
     {
         return [
             'rbac'=>[
                 'class'=>RbacFilter::className(),
-                'except' => ['logout','upload','captcha','ueditor'],
+                'except' => ['logout','upload','captcha','ueditor','del'],
             ],
         ];
-    }
+    }*/
     public function actions()
     {
         return [
@@ -46,7 +47,7 @@ class GoodsController extends Controller
                 'class' => 'kucha\ueditor\UEditorAction',
                 'config'=>[
                     //上传图片配置
-                    'imageUrlPrefix' => "http://www.admin.shop.com", /* 图片访问路径前缀 */
+                    'imageUrlPrefix' => "http://admin.yiishop.com", /* 图片访问路径前缀 */
                     'imagePathFormat' => "/goods/".date("Y-m-d",time()), /* 上传保存路径,可以自定义保存路径和文件名格式 */
                 ]
             ]
@@ -94,7 +95,7 @@ class GoodsController extends Controller
         if ($request->isPost) {
             $model->load($request->post());
             $introModel->load($request->post());
-            $date=date('Y-m-d');
+            $date = date('Y-m-d',time());
             $goodsDayCount = GoodsDayCount::findOne(['day' => $date]);
             if ($model->validate()) {
                 if ($goodsDayCount == null) {
@@ -113,6 +114,12 @@ class GoodsController extends Controller
                 $model->save();
                 $introModel->save();
                 $goodsDayCount->save();
+
+                $id = \Yii::$app->db->getLastInsertID();
+
+                /*
+生成静态文件
+*/
                 \Yii::$app->session->setFlash('success', '新增成功');
                 return $this->redirect(['index']);
             } else {
@@ -155,6 +162,18 @@ class GoodsController extends Controller
 
     }
     public function actionShow($id){
+        $goods=Goods::findOne(['id'=>$id]);                 //商品
+        $row=GoodsIntro::findOne(['goods_id'=>$id]);        //商品简介
+        $gallerys=GoodsGallery::findAll(['goods_id'=>$id]); //商品相册
+        //1.开启ob缓存
+        ob_start();
+        //2.将文件保存为静态文件
+        $contents=$this->renderPartial('@webroot/tpl/goods.php',['goods'=>$goods,'row'=>$row,'gallerys'=>$gallerys]);
+        //3.输出
+        file_put_contents(\Yii::getAlias('@frontend').'/web/goods/'.$id.'.html',$contents);
+        //关闭
+        ob_clean();
+
         $row=GoodsIntro::findOne(['goods_id'=>$id]);
 
         return $this->render('show',['row'=>$row]);
